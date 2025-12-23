@@ -1,0 +1,150 @@
+# =========================================================
+#                 GENERAL CONFIGURATION logix
+# =========================================================
+
+# Application Ports
+PORT_NUMBER_APP="5010"
+PORT_NUMBER_LOG="3000"
+
+
+# Timezone
+TIMEZONE="Asia/Jakarta"
+
+
+# =====================================================
+#                 DATABASE CONFIGURATION
+# =====================================================
+
+DB_HOST="127.0.0.1"
+DB_PORT="3306"
+DB_NAME="logix"
+DB_USER="logix"
+DB_PASSWORD="logix"
+
+
+# =====================================================
+#                 SENSOR DEVICES
+# =====================================================
+
+# --- Sensor AT500 ---
+AT500_STATUS="inactive"             # Options: active / inactive
+AT500_PORT="/dev/ttyAMA3"
+
+# --- Sensor RT200 ---
+RT200_STATUS="inactive"             # Options: active / inactive
+RT200_PORT="/dev/ttyAMA4"
+
+# --- Sensor SEM5096 ---
+SEM5096_STATUS="inactive"           # Options: active / inactive
+SEM5096_PORT="/dev/ttyAMA6"
+
+# --- Sensor MACE ---
+MACE_STATUS="inactive"              # Options: active / inactive
+MACE_PORT="/dev/ttyAMA5"
+
+# --- Sensor ISCAN ---
+ISCAN_STATUS="inactive"              # Options: active / inactive
+ISCAN_PORT="/dev/ttyAMA5"
+
+
+# --- Sensor LTNC ---
+LTNC_STATUS="active"              # Options: active / inactive
+LTNC_PORT="/dev/ttyAMA5"
+
+
+# --- Sensor SPECTRO ---
+SPECTRO_STATUS="inactive"           # Options: active / inactive
+SPECTRO_IP="192.168.1.100"
+SPECTRO_PORT="502"
+
+# --- Sensor CONTLYTE ---
+CONTLYTE_STATUS="active"          # Options: active / inactive
+CONTLYTE_PORT="/dev/ttyAMA5"
+
+
+# --- Sensor GPIO ARG314 ---
+ARG314_STATUS="inactive"            # Options: active / inactive
+RAIN_SENSOR_PIN="18"       # BCM pin untuk sensor tipping bucket
+RESOLUTION="0.202"          # mm per tipping
+DEBOUNCE_MS="200"           # debounce dalam milidetik
+DEMO_MODE="active"         # Options: active / inactive (jika active maka data curah hujan random)
+GPIO_MODULE="Rpi.GPIO"    # Options: Rpi.GPIO / lgpio
+
+# --- Sensor Interval ---
+DELAY="2"                           # Delay pembacaan (menit)
+
+# =====================================================
+#                 KLHK API CONFIGURATION
+# =====================================================
+
+KLHK_STATUS="inactive"              # Options: active / inactive
+KLHK_API_URL="https://sparing.kemenlh.go.id/api/send-hourly-vendor"
+KLHK_TOKEN_URL="https://sparing.kemenlh.go.id/api/secret-sensor"
+KLHK_UID="6d0e75e621cee16dfadfe1s"
+
+KLHK_FIELDS="datetime,pH,cod,tss,nh3n,flow"   # Parameter yang dikirim
+KLHK_MAX_DUP_RETRY="3"                        # Maks percobaan kirim ulang data duplikat
+KLHK_TARGET_MINUTE="10"                        # Target menit kirim ulang
+
+
+
+# =====================================================
+#                 HAS API CONFIGURATION
+# =====================================================
+
+HAS_STATUS="inactive"              # Options: active / inactive
+HAS_API_URL="https://sparing.kemenlh.go.id/api/send-hourly"
+HAS_TOKEN="https://sparing.kemenlh.go.id/api/secret-sensor"
+
+
+
+
+
+# =====================================================
+#                 SENSOR METADATA
+# =====================================================
+#Satuan Default:
+SATUAN_PH="pH"
+SATUAN_COD="mg/L"
+SATUAN_TSS="mg/L"
+SATUAN_NH3N="mg/L"
+SATUAN_FLOW="m3/menit"
+SATUAN_TEMP="°C"
+SATUAN_ORP="mV"
+SATUAN_TURB="NTU"
+SATUAN_TDS="ppm"
+SATUAN_CONDUCT="µS/cm"
+SATUAN_DO="mg/L"
+SATUAN_SALINITY="ppt"
+SATUAN_BATTERY="V"
+SATUAN_DEPTH="m"
+SATUAN_TFLOW="L"
+SATUAN_NO3="mg/L"
+SATUAN_BOD="mg/L"
+SATUAN_PRESS="mbar"
+SATUAN_HUM="%"
+SATUAN_WSPEED="m/s"
+SATUAN_WDIR="°"
+SATUAN_RAIN="mm"
+SATUAN_SRAD="W/m2"
+
+
+# Daftar Parameter yang tersedia
+# "pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
+
+# Parameter yang ditampilkan di dashboard
+PARAMETERS="pH,cod,tss,flow,temp"
+
+# Deteksi Gap data web (menit) jika tidak ada sensor maka akan dibuat terputus, GAP_WEB adaalah penambahan 1 menit dari delay 
+GAP_WEB="3"
+
+WEB_TITLE="WQMS"
+WEB_NAME="Water Quality Monitoring System"
+
+DEVICE_ID="HSP-2505X001"
+LOCATION_NAME="PT. Has Environmental"
+
+SOFTWARE_VERSION="1.0.0"
+GEO_LATITUDE="-6.5224399"
+GEO_LONGITUDE="106.8384747"
+
