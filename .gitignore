@@ -2,3 +2,4 @@ venv/
 log/
 logs/
 database/backup/
+backend/__pycache__/
