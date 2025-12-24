@@ -95,7 +95,7 @@ KLHK_TARGET_MINUTE="10"                        # Target menit kirim ulang
 HAS_STATUS="active"              # Options: active / inactive
 HAS_API_URL="http://202.10.41.54:9001/api/data"
 HAS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4 # Token API HASsssss
-HAS_FIELDS="datetime,pH,depth"   # Parameter yang dikirim
+HAS_FIELDS="datetime,pH,tss,cod,wtemp,flow"   # Parameter yang dikirim
 
 
 
@@ -143,8 +143,7 @@ GAP_WEB="3"
 WEB_TITLE="WQMS"
 WEB_NAME="Water Quality Monitoring System"
 
-#DEVICE_ID="HSP-2505X001"
-DEVICE_ID="HSL-2510X001"
+DEVICE_ID="HSP-2505X001"
 LOCATION_NAME="PT. Has Environmental"
 
 SOFTWARE_VERSION="1.0.0"

@@ -87,10 +87,10 @@ def get_rt200_data():
         return
     else:
         print("[INFO] Modul RT200 aktif. Melakukan pembacaan data.")  
-        temp = read_temp()
-        press = read_press()
+        wtemp = read_temp()
+        wpress = read_press()
         depth = round((read_depth() * 30.48),2)  # Konversi dari feet ke cm
-        return temp, press, depth
+        return wtemp, wpress, depth
 
 
 # # Tambahan untuk menjalankan langsung

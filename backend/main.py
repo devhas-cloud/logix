@@ -112,15 +112,15 @@ def main():
     # Initialize variables with default values (None)
     # ph, orp, tds, conduct, do, salinity, nh3n = (None,) * 7
     # battery, depth, flow, tflow = (None,) * 4
-    # turb, tss, cod, bod, no3, temp = (None,) * 6
-    # press, hum, wspeed, wdir, rain, srad = (None,) * 6
+    # turb, tss, cod, bod, no3, wtemp = (None,) * 6
+    # wpress, hum, wspeed, wdir, rain, srad = (None,) * 6
     
     try:
         while True:
             ph, orp, tds, conduct, do, salinity, nh3n = (None,) * 7
             battery, depth, flow, tflow = (None,) * 4
-            turb, tss, cod, bod, no3, temp = (None,) * 6
-            press, hum, wspeed, wdir, rain, srad = (None,) * 6
+            turb, tss, cod, bod, no3, atemp, wtemp = (None,) * 7
+            apress, wpress, hum, wspeed, wdir, rain, srad = (None,) * 7
             now = datetime.now()
             if should_run():
                 # Ensure we don't run twice at the same time
@@ -154,8 +154,8 @@ def main():
                         if rt200_data:
                             new_temp, new_press, new_depth = rt200_data
                             # Update global variables only if new data is not None
-                            temp = new_temp if new_temp is not None else temp
-                            press = new_press if new_press is not None else press
+                            wtemp = new_temp if new_temp is not None else wtemp
+                            wpress = new_press if new_press is not None else wpress
                             depth = new_depth if new_depth is not None else depth
                         else:
                             status_filter = False
@@ -167,9 +167,9 @@ def main():
                         if sem5096_data:
                             new_temp, new_hum, new_press, new_wspeed, new_wdir, new_rain, new_srad = sem5096_data
                             # Update global variables only if new data is not None
-                            temp = new_temp if new_temp is not None else temp
+                            atemp = new_temp if new_temp is not None else atemp
                             hum = new_hum if new_hum is not None else hum
-                            press = new_press if new_press is not None else press
+                            apress = new_press if new_press is not None else apress
                             wspeed = new_wspeed if new_wspeed is not None else wspeed
                             wdir = new_wdir if new_wdir is not None else wdir
                             rain = new_rain if new_rain is not None else rain
@@ -204,7 +204,7 @@ def main():
                             cod = new_cod if new_cod is not None else cod
                             bod = new_bod if new_bod is not None else bod
                             no3 = new_no3 if new_no3 is not None else no3
-                            temp = new_temp if new_temp is not None else temp
+                            wtemp = new_temp if new_temp is not None else wtemp
                         else:
                             status_filter = False
                             print(f"[{current_date}] ⚠️ Gagal membaca data Modbus TCP.")
@@ -217,7 +217,7 @@ def main():
                             # Update global variables only if new data is not None
                             cod = new_cod if new_cod is not None else cod
                             tss = new_tss if new_tss is not None else tss
-                            temp = new_temp if new_temp is not None else temp
+                            wtemp = new_temp if new_temp is not None else wtemp
                         else:
                             status_filter = False
                             print(f"[{current_date}] ⚠️ Gagal membaca data ISCAN.")
@@ -245,7 +245,7 @@ def main():
                             ph = new_ph if new_ph is not None else ph
                             tss = new_tss if new_tss is not None else tss
                             cod = new_cod if new_cod is not None else cod
-                            temp = new_temp if new_temp is not None else temp
+                            wtemp = new_temp if new_temp is not None else wtemp
                         else:
                             status_filter = False
                             print(f"[{current_date}] ⚠️ Gagal membaca data CONTLYTE.")
@@ -268,8 +268,8 @@ def main():
                             print("\n=== SENSOR DATA ===")
                             print(f"→ pH: {ph}, ORP: {orp}, TDS: {tds}, Conductivity: {conduct}, DO: {do}, Salinity: {salinity}, NH3-N: {nh3n}")
                             print(f"→ Battery: {battery}, Depth: {depth}, Flow: {flow}, TFlow: {tflow}")
-                            print(f"→ Turbidity: {turb}, TSS: {tss}, COD: {cod}, BOD: {bod}, NO3: {no3}, Temp: {temp}")
-                            print(f"→ Press: {press} Hum: {hum}, WSpeed: {wspeed}, WDir: {wdir}, Rain: {rain}, SRad: {srad}")
+                            print(f"→ Turbidity: {turb}, TSS: {tss}, COD: {cod}, BOD: {bod}, NO3: {no3}, atemp: {atemp}, wtemp: {wtemp}")
+                            print(f"→ apress: {apress} wpress: {wpress} Hum: {hum}, WSpeed: {wspeed}, WDir: {wdir}, Rain: {rain}, SRad: {srad}")
                             print("===================  \n")
                             
                             insert_data(
@@ -277,8 +277,8 @@ def main():
                                 current_datetime,
                                 ph, orp, tds, conduct, do, salinity, nh3n,
                                 battery, depth, flow, tflow,
-                                turb, tss, cod, bod, no3, temp,
-                                press, hum, wspeed, wdir, rain, srad
+                                turb, tss, cod, bod, no3, atemp, wtemp,
+                                apress,wpress, hum, wspeed, wdir, rain, srad
                             ) 
                     else:
                         print(f"[{current_date}] ❌ Tidak semua sensor berhasil terbaca. Data tidak disimpan.")

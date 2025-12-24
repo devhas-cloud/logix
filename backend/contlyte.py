@@ -98,8 +98,8 @@ def get_conlyte_data():
         ph = read_ph()
         tss = read_tss()
         cod = read_cod()
-        temp = read_temp()
-        return ph, tss, cod, temp
+        wtemp = read_temp()
+        return ph, tss, cod, wtemp
 
 # #========= Tambahan minimal agar bisa langsung jalan dari terminal (serial monitor) =========
 # if __name__ == "__main__":

@@ -97,9 +97,9 @@ def get_iscan_data():
         print("[INFO] Modul ISCAN aktif. Melakukan pembacaan data.")
         cod = read_cod()
         tss = read_tss()
-        temp = read_temp()
+        wtemp = read_temp()
 
-        return cod, tss, temp
+        return cod, tss, wtemp
 
     except Exception as e:
         print(f"[ERROR] Gagal membaca data ISCAN: {e}")

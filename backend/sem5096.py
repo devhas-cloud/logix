@@ -60,16 +60,16 @@ def get_sem5096_data():
         #print(f"✅ Raw response: {response.hex()}")
 
         try:
-            temp = round(int.from_bytes(response[3:5], byteorder='big') / 100 - 40, 2)
+            atemp = round(int.from_bytes(response[3:5], byteorder='big') / 100 - 40, 2)
             hum = round(int.from_bytes(response[5:7], byteorder='big') / 100, 2)
-            press = round(int.from_bytes(response[7:9], byteorder='big') / 10, 2)
+            apress = round(int.from_bytes(response[7:9], byteorder='big') / 10, 2)
             wspeed = round(int.from_bytes(response[9:11], byteorder='big') / 100, 2)
             wdir = round(int.from_bytes(response[11:13], byteorder='big') / 10, 2)
             rain = round(int.from_bytes(response[13:15], byteorder='big') / 10, 2)
             srad = int.from_bytes(response[15:17], byteorder='big')
 
             #print(f"✅ Parsed: Temp={temp}, Hum={hum}, Press={press}, WSpeed={wspeed}, WDir={wdir}, Rain={rain}, Srad={srad}")
-            return (temp, hum, press, wspeed, wdir, rain, srad)
+            return (atemp, hum, apress, wspeed, wdir, rain, srad)
 
         except Exception as parse_err:
             print(f"❌ Gagal parsing data sensor: {parse_err}")

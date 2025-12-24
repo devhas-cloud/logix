@@ -72,8 +72,10 @@ def cekTable():
                 cod FLOAT DEFAULT 0,
                 bod FLOAT DEFAULT 0,
                 no3 FLOAT DEFAULT 0,
-                temp FLOAT DEFAULT 0,
-                press FLOAT DEFAULT 0,
+                atemp FLOAT DEFAULT 0,
+                wtemp FLOAT DEFAULT 0,
+                apress FLOAT DEFAULT 0,
+                wpress FLOAT DEFAULT 0,
                 hum FLOAT DEFAULT 0,
                 wspeed FLOAT DEFAULT 0,
                 wdir FLOAT DEFAULT 0,
@@ -109,8 +111,10 @@ def cekTable():
                 cod FLOAT DEFAULT 0,
                 bod FLOAT DEFAULT 0,
                 no3 FLOAT DEFAULT 0,
-                temp FLOAT DEFAULT 0,
-                press FLOAT DEFAULT 0,
+                atemp FLOAT DEFAULT 0,
+                wtemp FLOAT DEFAULT 0,
+                apress FLOAT DEFAULT 0,
+                wpress FLOAT DEFAULT 0,
                 hum FLOAT DEFAULT 0,
                 wspeed FLOAT DEFAULT 0,
                 wdir FLOAT DEFAULT 0,
@@ -128,13 +132,13 @@ def cekTable():
         print(f"[{datetime.now()}] Error pada koneksi database: {e}")
         return    
 
-def insert_data(date,  datetime, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, temp, press, hum, wspeed, wdir, rain, srad):
+def insert_data(date,  datetime, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad):
     
     device = DEVICE
     cekTable()        
     query = """
-        INSERT INTO tmp (device, date, datetime, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, temp, press, hum, wspeed, wdir, rain, srad)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,  %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        INSERT INTO tmp (device, date, datetime, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,  %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         
     try:
@@ -144,7 +148,7 @@ def insert_data(date,  datetime, ph, orp, tds, conduct, do, salinity, nh3n, batt
         values = (
                 device,
                 date, datetime,
-                ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, temp, press, hum, wspeed, wdir, rain, srad
+                ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad
             )
             #values = tuple("NULL" if v is None else v for v in values) # ganti jika None menjadi 0
         cursor.execute(query, values)

@@ -78,11 +78,11 @@ def read_modbus_tcp():
         print(f"NO3: {no3}")
 
         # Request Parameter 6
-        temp = send_modbus_request(sock, 2, unit_id, 0x00AA, 2)
-        print(f"Temperature: {temp}")
+        wtemp = send_modbus_request(sock, 2, unit_id, 0x00AA, 2)
+        print(f"Temperature: {wtemp}")
 
         sock.close()
-        return turb, tss, cod, bod, no3, temp
+        return turb, tss, cod, bod, no3, wtemp
 
     except Exception as e:
         print(f"Terjadi error: {e}")

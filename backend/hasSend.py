@@ -173,7 +173,8 @@ def send_data_to_api(FIELDS,DATE):
 
     try:
         response = requests.post(API_ENDPOINT, headers=headers, json=payload)
-        print(f"payload: {json.dumps(payload)} ")
+        print("payload:", json.dumps(payload, indent=4, sort_keys=False))
+
         if response.status_code in [200, 201]:  # 200 OK atau 201 Created
             print(f"✅ Data untuk tanggal {date} berhasil dikirim ke HAS API.")
             #update status has di database
