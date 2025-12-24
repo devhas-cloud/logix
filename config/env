@@ -35,8 +35,8 @@ RT200_STATUS="inactive"             # Options: active / inactive
 RT200_PORT="/dev/ttyAMA4"
 
 # --- Sensor SEM5096 ---
-SEM5096_STATUS="inactive"           # Options: active / inactive
-SEM5096_PORT="/dev/ttyAMA6"
+SEM5096_STATUS="active"           # Options: active / inactive
+SEM5096_PORT="/dev/ttyS0"
 
 # --- Sensor MACE ---
 MACE_STATUS="inactive"              # Options: active / inactive
@@ -48,7 +48,7 @@ ISCAN_PORT="/dev/ttyAMA5"
 
 
 # --- Sensor LTNC ---
-LTNC_STATUS="active"              # Options: active / inactive
+LTNC_STATUS="inactive"              # Options: active / inactive
 LTNC_PORT="/dev/ttyAMA5"
 
 
@@ -58,7 +58,7 @@ SPECTRO_IP="192.168.1.100"
 SPECTRO_PORT="502"
 
 # --- Sensor CONTLYTE ---
-CONTLYTE_STATUS="active"          # Options: active / inactive
+CONTLYTE_STATUS="inactive"          # Options: active / inactive
 CONTLYTE_PORT="/dev/ttyAMA5"
 
 
@@ -95,7 +95,7 @@ KLHK_TARGET_MINUTE="10"                        # Target menit kirim ulang
 HAS_STATUS="active"              # Options: active / inactive
 HAS_API_URL="http://202.10.41.54:9001/api/data"
 HAS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4 # Token API HASsssss
-HAS_FIELDS="datetime,pH,tss,cod,wtemp,flow"   # Parameter yang dikirim
+HAS_FIELDS="datetime,atemp,apress,hum,wspeed,wdir,rain,srad"   # Parameter yang dikirim
 
 
 
@@ -111,7 +111,8 @@ SATUAN_COD="mg/L"
 SATUAN_TSS="mg/L"
 SATUAN_NH3N="mg/L"
 SATUAN_FLOW="m3/menit"
-SATUAN_TEMP="°C"
+SATUAN_ATEMP="°C"
+SATUAN_WTEMP="°C"
 SATUAN_ORP="mV"
 SATUAN_TURB="NTU"
 SATUAN_TDS="ppm"
@@ -123,7 +124,8 @@ SATUAN_DEPTH="m"
 SATUAN_TFLOW="L"
 SATUAN_NO3="mg/L"
 SATUAN_BOD="mg/L"
-SATUAN_PRESS="mbar"
+SATUAN_APRESS="mbar"
+SATUAN_WPRESS="mbar"
 SATUAN_HUM="%"
 SATUAN_WSPEED="m/s"
 SATUAN_WDIR="°"
@@ -135,15 +137,15 @@ SATUAN_SRAD="W/m2"
 # "pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
 
 # Parameter yang ditampilkan di dashboard
-PARAMETERS="pH,cod,tss,flow,temp"
+PARAMETERS="atemp,apress,hum,wspeed,wdir,rain,srad"
 
 # Deteksi Gap data web (menit) jika tidak ada sensor maka akan dibuat terputus, GAP_WEB adaalah penambahan 1 menit dari delay 
 GAP_WEB="3"
 
-WEB_TITLE="WQMS"
-WEB_NAME="Water Quality Monitoring System"
+WEB_TITLE="AWS"
+WEB_NAME="Automatic Weather Station"
 
-DEVICE_ID="HSP-2505X001"
+DEVICE_ID="HSC-2505X001"
 LOCATION_NAME="PT. Has Environmental"
 
 SOFTWARE_VERSION="1.0.0"

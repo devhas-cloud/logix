@@ -12,7 +12,7 @@ async function initializeDashboard() {
         await updateAllData(); // Lakukan fetch data pertama kali
 
         // Set interval untuk refresh data
-        setInterval(updateAllData, 5000); // Refresh setiap 30 detik 
+        setInterval(updateAllData, 30000); // Refresh setiap 30 detik
 
     } catch (e) {
         console.error("Gagal inisialisasi dashboard:", e);
@@ -74,8 +74,10 @@ function setupUIFromConfig() {
     document.getElementById('cod-unit').textContent = `${config.satuancod || ''}`;
     document.getElementById('bod-unit').textContent = `${config.satuanbod || ''}`;
     document.getElementById('no3-unit').textContent = `${config.satuanno3 || ''}`;
-    document.getElementById('temp-unit').textContent = `${config.satuantemp || ''}`;
-    document.getElementById('press-unit').textContent = `${config.satuanpress || ''}`;
+    document.getElementById('atemp-unit').textContent = `${config.satuanatemp || ''}`;
+    document.getElementById('wtemp-unit').textContent = `${config.satuanwtemp || ''}`;
+    document.getElementById('apress-unit').textContent = `${config.satuanapress || ''}`;
+    document.getElementById('wpress-unit').textContent = `${config.satuanwpress || ''}`;
     document.getElementById('hum-unit').textContent = `${config.satuanhum || ''}`;
     document.getElementById('wspeed-unit').textContent = `${config.satuanwspeed || ''}`;
     document.getElementById('wdir-unit').textContent = `${config.satuanwdir || ''}`;
@@ -113,9 +115,9 @@ async function updateLatestData() {
                 valueEl.textContent = data[key].toFixed(2);
             }
 
-            // if (data[key] === null) {
-            //     valueEl.textContent = 'N/A';
-            // }
+            if (data[key] === null) {
+                valueEl.textContent = 'N/A';
+            }
 
         });
 
@@ -444,7 +446,7 @@ setInterval(() => {
     //fetchHistory(param, range);
     renderHistoryChart(param, range);
     renderWindRose(range);
-}, 5000);
+}, 30000);
 
 
 //wifi deteksi
