@@ -3,7 +3,7 @@ import struct
 import time
 import os
 from dotenv import load_dotenv
-
+from logsSend import send_network_log, send_connection_log, send_sensor_log
 # Load environment variables
 env_path = "/opt/logix/config/env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
@@ -40,16 +40,40 @@ def send_modbus_request(sock, transaction_id, unit_id, start_address, register_c
     return value
 
 def read_modbus_tcp():
-    
+    ip = IP    # IP sensor
+
     if STATUS.lower() != "active":
-        print("[INFO] Modul SPECTRO tidak aktif. Melewati pembacaan data.")
+        print("[INFO] Modul SPECTRO tidak aktif. Melewati pengecekan koneksi.")
         return None,None,None,None,None,None
+ 
+    # =======================
+    # PING CHECK
+    # =======================
+
+    try:
+        print(f"[INFO] Memeriksa koneksi ke {ip}...")
+        response = os.system(f"ping -c 1 -W 2 {ip} > /dev/null 2>&1")
+        if response == 0:
+            print(f"[INFO] Koneksi ke {ip} berhasil.")
+        else:
+            print(f"[WARNING] Koneksi ke {ip} gagal.")
+            send_network_log(f"Gagal koneksi ke sensor SPECTRO di IP {ip}.")
+            return
+    except Exception as e:
+        print(f"[ERROR] Terjadi error saat memeriksa koneksi: {e}")
+        send_network_log(f"Error saat memeriksa koneksi ke sensor SPECTRO di IP {ip}: {e}")
+        return
     
+    # =======================
+    # MODBUS TCP READ
+    # =======================
+
+
     try:
         print("[INFO] Modul SPECTRO aktif. Melakukan pembacaan data.")
         print("Menghubungkan ke sensor Modbus TCP...")
 
-        ip = IP    # IP sensor
+        
         port = int(PORT)
         unit_id = 0xFF          # Slave ID sensor
 
@@ -86,4 +110,6 @@ def read_modbus_tcp():
 
     except Exception as e:
         print(f"Terjadi error: {e}")
+        send_sensor_log(f"Error saat membaca data dari sensor SPECTRO: {e}")
         return None,None,None,None,None,None
+

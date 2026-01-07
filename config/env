@@ -71,7 +71,7 @@ DEMO_MODE="active"         # Options: active / inactive (jika active maka data c
 GPIO_MODULE="Rpi.GPIO"    # Options: Rpi.GPIO / lgpio
 
 # --- Sensor Interval ---
-DELAY="2"                           # Delay pembacaan (menit)
+DELAY="1"                           # Delay pembacaan (menit)
 
 # =====================================================
 #                 KLHK API CONFIGURATION
@@ -93,11 +93,17 @@ KLHK_TARGET_MINUTE="10"                        # Target menit kirim ulang
 # =====================================================
 
 HAS_STATUS="active"              # Options: active / inactive
-HAS_API_URL="http://202.10.41.54:9001/api/data"
+HAS_API_URL="https://api.hasportal.com/api/v1/data"
 HAS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4 # Token API HASsssss
 HAS_FIELDS="datetime,atemp,apress,hum,wspeed,wdir,rain,srad"   # Parameter yang dikirim
 
 
+
+# =====================================================
+#                 HAS LOGS API CONFIGURATION
+# =====================================================
+HAS_LOGS_API_URL="http://202.10.41.54:8003/api/v1/logs"
+HAS_LOGS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4 # Token API HAS
 
 
 

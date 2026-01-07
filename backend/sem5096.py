@@ -5,6 +5,7 @@ import os
 import traceback
 import os
 from dotenv import load_dotenv
+from logsSend import send_network_log,send_connection_log,send_sensor_log
 
 
 # Load environment variables
@@ -18,12 +19,15 @@ SEM5096_PORT = os.getenv('SEM5096_PORT')
 
 def get_sem5096_data():
     
+
     if SEM5096_STATUS.lower() != "active":
-        print("[INFO] Modul RT200 tidak aktif. Melewati pembacaan data.")
+        print("[INFO] Modul RT200 tidak aktif. Melewati pembacaan data. api")
+        send_sensor_log("Konfigurasi Modul SEM5096 tidak aktif.")
         return None, None, None, None, None, None, None
 
     if not os.path.exists(SEM5096_PORT):
         print(f"Port {SEM5096_PORT} tidak tersedia. Membatalkan semua pembacaan.")
+        send_connection_log(f"Port {SEM5096_PORT} tidak tersedia.")
         return
     
     try:
@@ -55,6 +59,7 @@ def get_sem5096_data():
 
         if not response or len(response) < 17:
             print(f"❌ Response kosong atau terlalu pendek: {response}")
+            send_sensor_log("Gagal membaca data dari sensor SEM5096: Response kosong atau terlalu pendek.")
             return None
 
         #print(f"✅ Raw response: {response.hex()}")
@@ -73,14 +78,15 @@ def get_sem5096_data():
 
         except Exception as parse_err:
             print(f"❌ Gagal parsing data sensor: {parse_err}")
+            send_sensor_log(f"Gagal parsing data dari sensor SEM5096: {parse_err}")
             traceback.print_exc()
             return
 
     except Exception as e:
         print(f"❌ Exception saat membaca sensor: {e}")
+        send_sensor_log(f"Exception saat membaca data dari sensor SEM5096: {e}")
         traceback.print_exc()
         return
-
 
 # === Untuk pengujian langsung ===
 # if __name__ == "__main__":

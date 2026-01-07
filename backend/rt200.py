@@ -3,7 +3,7 @@ import struct
 import time
 import os
 from dotenv import load_dotenv
-
+from logsSend import send_network_log, send_connection_log, send_sensor_log
 env_path = "/opt/logix/config/env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
     print(f"Error: env file not found at {env_path}")
@@ -15,7 +15,7 @@ PORT_SERIAL = os.getenv('RT200_PORT')
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
 MAX_RETRIES = 5
 
-def read_modbus(port, request, crc):
+def read_modbus(parameter,port, request, crc):
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             baudrate = 19200
@@ -53,10 +53,12 @@ def read_modbus(port, request, crc):
             time.sleep(1)  # Tunggu sebelum mencoba lagi
 
     print(f"Gagal membaca data dari {port} setelah {MAX_RETRIES} percobaan.")
+    send_sensor_log(f"Gagal membaca data RT200 - {parameter} dari {port} setelah {MAX_RETRIES} percobaan.")
     return None  # Kembalikan None jika gagal membaca setelah 3 percobaan
 
 def read_temp():
     return read_modbus(
+        "temp",
         PORT_SERIAL,
         bytearray([0x05, 0x03, 0x00, 0x2D, 0x00, 0x02]),
         bytearray([0x55, 0x86])
@@ -64,6 +66,7 @@ def read_temp():
 
 def read_press():
     return read_modbus(
+        "press",
         PORT_SERIAL,
         bytearray([0x05, 0x03, 0x00, 0x25, 0x00, 0x02]),
         bytearray([0xD4, 0x44])
@@ -71,6 +74,7 @@ def read_press():
 
 def read_depth():
     return read_modbus(
+        "depth",
         PORT_SERIAL,
         bytearray([0x05, 0x03, 0x00, 0x35, 0x00, 0x02]),
         bytearray([0xD5, 0x81])
@@ -80,10 +84,12 @@ def get_rt200_data():
     
     if RT200_STATUS.lower() != "active":
         print("[INFO] Modul RT200 tidak aktif. Melewati pembacaan data.")
+        send_sensor_log("Konfigurasi Modul RT200 tidak aktif.")
         return None, None, None
 
     if not os.path.exists(PORT_SERIAL):
         print(f"Port {PORT_SERIAL} tidak tersedia. Membatalkan semua pembacaan.")
+        send_connection_log(f"Port RT200 {PORT_SERIAL} tidak tersedia.")
         return
     else:
         print("[INFO] Modul RT200 aktif. Melakukan pembacaan data.")  

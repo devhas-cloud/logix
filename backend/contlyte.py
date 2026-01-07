@@ -3,6 +3,7 @@ import struct
 import time
 import os
 from dotenv import load_dotenv
+from logsSend import send_network_log, send_connection_log, send_sensor_log
 
 env_path = "/opt/logix/config/env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
@@ -53,6 +54,7 @@ def read_modbus(port, request, crc):
             time.sleep(0.5)  # Tunggu sebelum mencoba lagi
 
     print(f"Gagal membaca data dari {port} setelah {MAX_RETRIES} percobaan.")
+    send_sensor_log(f"Gagal membaca data CONTLYTE dari {port} setelah {MAX_RETRIES} percobaan.")
     return None  # Kembalikan None jika gagal membaca setelah 3 percobaan
 
 def read_ph():
@@ -87,10 +89,12 @@ def get_conlyte_data():
 
     if CONTLYTE_STATUS != "active":
         print("[INFO] Modul CONTLYTE tidak aktif. Melewati pembacaan data.")
+        send_sensor_log("Konfigurasi Modul CONTLYTE tidak aktif.")
         return None, None, None, None
 
     if not os.path.exists(CONTLYTE_PORT):
         print(f"Port {CONTLYTE_PORT} tidak tersedia. Membatalkan semua pembacaan.")
+        send_connection_log(f"Port CONTLYTE {CONTLYTE_PORT} tidak tersedia.")
         return
 
     else:

@@ -34,6 +34,7 @@ def read_mace():
         if not response:
             print("No response received from MACE sensor")
             ser.close()
+            send_sensor_log("Gagal membaca data MACE: No response received from sensor")
             return None, None, None, None
         
         if len(response) >= 15:  
@@ -43,23 +44,27 @@ def read_mace():
             tflow = round(struct.unpack('>f', response[15:19])[0], 2)
         else:
             print("Incomplete response received from MACE sensor")
+            send_sensor_log("Gagal membaca data MACE: Incomplete response received from sensor Null")
             ser.close()
             return None, None, None, None
 
         ser.close()
         return battery, depth, flow, tflow
     except Exception as e:
-        print(f"Error in read_modbus4: {e}")
+        print(f"Error in read_modbus: {e}")
+        send_sensor_log(f"Error in read_modbus MACE: {e}")
         return None, None, None, None
 
 def get_mace_data():
     
     if MACE_STATUS.lower() != "active":
         print("[INFO] Modul MACE tidak aktif. Melewati pembacaan data.")
+        send_sensor_log("Konfigurasi Modul MACE tidak aktif.")
         return (None,) * 4
     
     if not os.path.exists(MACE_PORT):
         print(f"Port {MACE_PORT} tidak tersedia. Membatalkan semua pembacaan.")
+        send_connection_log(f"Port MACE {MACE_PORT} tidak tersedia.")
         return
     
     try:
@@ -67,5 +72,6 @@ def get_mace_data():
         return read_mace()
 
     except Exception as e:
-        print(f"[ERROR] Gagal membaca data AT500: {e}")
+        print(f"[ERROR] Gagal membaca data MACE: {e}")
+        send_sensor_log(f"Gagal membaca data MACE: {e}")
         return (None,) * 4

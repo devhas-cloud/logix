@@ -11,6 +11,7 @@ from config import insert_data, ambilDate, ambilDateTime
 from datetime import datetime
 from dotenv import load_dotenv
 from contlyte import get_conlyte_data
+from logsSend import send_network_log, send_connection_log, send_sensor_log
 import sqlite3
 import pytz
 
@@ -262,7 +263,9 @@ def main():
                     if status_filter:
                         # Check if any sensor is active
                         if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, ARG314_STATUS]):
+                            send_sensor_log("Semua modul sensor tidak aktif. Melewati penyimpanan data.")
                             print(f"[{current_date}] ⚠️ Semua modul sensor tidak aktif. Melewati penyimpanan data.")
+
                         else:
                             print(f"[{current_date}] ✅ Semua data sensor berhasil terbaca.")
                             print("\n=== SENSOR DATA ===")
@@ -282,6 +285,7 @@ def main():
                             ) 
                     else:
                         print(f"[{current_date}] ❌ Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
+                        send_sensor_log("Tidak semua sensor berhasil terbaca. periksa konfigurasi.")
                     
                     last_run = now.replace(second=0, microsecond=0)
             

@@ -4,7 +4,7 @@ import time
 
 import os
 from dotenv import load_dotenv
-
+from logsSend import send_network_log, send_connection_log, send_sensor_log
 env_path = "/opt/logix/config/env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
     print(f"Error: env file not found at {env_path}")
@@ -54,6 +54,7 @@ def read_modbus(port, request, crc):
             time.sleep(0.5)  # Tunggu sebelum mencoba lagi
 
     print(f"Gagal membaca data dari {port} setelah {MAX_RETRIES} percobaan.")
+    send_sensor_log(f"Gagal membaca data ISCAN dari {port} setelah {MAX_RETRIES} percobaan.")
     return None  # Kembalikan None jika gagal membaca setelah 3 percobaan
 
 def read_cod():
@@ -87,10 +88,12 @@ def get_iscan_data():
 
     if ISCAN_STATUS.lower() != "active":
         print("[INFO] Modul ISCAN tidak aktif. Melewati pembacaan data.")
+        send_sensor_log("Konfigurasi Modul ISCAN tidak aktif.")
         return (None,) * 3
 
     if not os.path.exists(ISCAN_PORT):
         print(f"[ERROR] Port {ISCAN_PORT} tidak tersedia. Membatalkan pembacaan.")
+        send_connection_log(f"Port ISCAN {ISCAN_PORT} tidak tersedia.")
         return
 
     try:
@@ -103,5 +106,6 @@ def get_iscan_data():
 
     except Exception as e:
         print(f"[ERROR] Gagal membaca data ISCAN: {e}")
+        send_sensor_log(f"Gagal membaca data ISCAN: {e}")
         return (None,) * 3
 

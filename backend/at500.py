@@ -4,6 +4,7 @@ import time
 import os
 from config import ambilDataTerakhir 
 from dotenv import load_dotenv
+from logsSend import send_network_log, send_connection_log, send_sensor_log
 
 env_path = "/opt/logix/config/env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
@@ -13,7 +14,7 @@ if not load_dotenv(dotenv_path=env_path):
 AT500_STATUS = os.getenv('AT500_STATUS')
 AT500_PORT = os.getenv('AT500_PORT')
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
-MAX_RETRIES = 10
+MAX_RETRIES = 3
 
 def read_modbus(port, request, crc):
     for attempt in range(1, MAX_RETRIES + 1):
@@ -53,6 +54,7 @@ def read_modbus(port, request, crc):
             time.sleep(0.5)  # Tunggu sebelum mencoba lagi
 
     print(f"Gagal membaca data dari {port} setelah {MAX_RETRIES} percobaan.")
+    send_sensor_log(f"Gagal membaca data Sensor AT500 dari {port} setelah {MAX_RETRIES} percobaan.")
     return None  # Kembalikan None jika gagal membaca setelah 3 percobaan
 
 def read_ph():
@@ -113,10 +115,12 @@ def get_at500_data():
 
     if AT500_STATUS.lower() != "active":
         print("[INFO] Modul AT500 tidak aktif. Melewati pembacaan data.")
+        send_sensor_log("Konfigurasi Modul AT500 tidak aktif.")
         return (None,) * 7
 
     if not os.path.exists(AT500_PORT):
         print(f"[ERROR] Port {AT500_PORT} tidak tersedia. Membatalkan pembacaan.")
+        send_connection_log(f"Port Sensor AT500 {AT500_PORT} tidak tersedia.")
         return
 
     try:
@@ -132,5 +136,6 @@ def get_at500_data():
 
     except Exception as e:
         print(f"[ERROR] Gagal membaca data AT500: {e}")
+        send_sensor_log(f"Exception saat membaca data dari sensor AT500: {e}")
         return (None,) * 7
 
