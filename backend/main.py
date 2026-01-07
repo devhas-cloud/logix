@@ -285,7 +285,7 @@ def main():
                             ) 
                     else:
                         print(f"[{current_date}] ❌ Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
-                        send_sensor_log("Tidak semua sensor berhasil terbaca. periksa konfigurasi.")
+                        
                     
                     last_run = now.replace(second=0, microsecond=0)
             
