@@ -19,6 +19,24 @@ set -e  # Hentikan jika terjadi error
 
 APP_BASE="/opt/logix"
 SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-gpio.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service")
+TIMERS=("logix-log-cleanup.timer")
+
+# === Hentikan dan nonaktifkan semua timer ===
+echo "🛑 Menghentikan dan menonaktifkan systemd timers..."
+for timer in "${TIMERS[@]}"; do
+    if systemctl is-enabled --quiet "$timer" 2>/dev/null; then
+        echo "🔻 Menonaktifkan & menghentikan $timer..."
+        systemctl stop "$timer"
+        systemctl disable "$timer"
+        rm -f "/etc/systemd/system/$timer"
+        # Hapus juga service yang terkait
+        service_file="${timer%.timer}.service"
+        rm -f "/etc/systemd/system/$service_file"
+        echo "✅ $timer dihapus."
+    else
+        echo "ℹ️  $timer tidak ditemukan atau sudah nonaktif."
+    fi
+done
 
 # === Hentikan dan nonaktifkan semua service ===
 echo "🛑 Menghentikan dan menonaktifkan systemd services..."

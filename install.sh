@@ -253,6 +253,21 @@ EOF
 done
 echo ""
 
+# === Setup Log Cleanup Timer ===
+echo "🕐 Mengatur timer pembersihan log otomatis..."
+chmod +x "$APP_BASE/backend/log_cleanup.py"
+
+# Copy service dan timer file ke systemd
+cp "$APP_BASE/logix-log-cleanup.service" /etc/systemd/system/
+cp "$APP_BASE/logix-log-cleanup.timer" /etc/systemd/system/
+
+systemctl daemon-reload
+systemctl enable logix-log-cleanup.timer
+systemctl start logix-log-cleanup.timer
+
+echo "✅ Log cleanup timer aktif (berjalan setiap hari pukul 02:00)"
+echo ""
+
 # === Selesai ===
 echo "🎉 Instalasi logix selesai!"
 echo "👉 Gunakan perintah 'logix' di terminal."

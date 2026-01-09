@@ -1,0 +1,12 @@
+[Unit]
+Description=Logix Log Cleanup Timer
+Documentation=Menjalankan log cleanup setiap hari pukul 02:00
+
+[Timer]
+# Jalankan setiap hari pukul 02:00
+OnCalendar=daily
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
