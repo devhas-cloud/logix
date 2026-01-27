@@ -1,4 +1,5 @@
-from flask import Flask, send_from_directory, jsonify, request, send_file
+from flask import Flask, send_from_directory, jsonify, request, send_file, session
+from functools import wraps
 import pandas as pd
 from datetime import datetime, timedelta
 import json
@@ -11,6 +12,8 @@ import re
 import subprocess
 import mysql.connector
 from dotenv import load_dotenv
+import hashlib
+import secrets
 
 # === Logging Setup ===
 log_path = "/opt/logix/log/web.log"
@@ -93,6 +96,34 @@ except Exception as e:
     
 # === Flask App ===
 app = Flask(__name__, static_folder=None)
+
+# === Authentication Setup ===
+app.secret_key = secrets.token_hex(32)
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
+
+# Default credentials - change these in production
+DEFAULT_USERNAME = 'admin'
+DEFAULT_PASSWORD_HASH = hashlib.sha256('Has123456'.encode()).hexdigest()
+
+def hash_password(password):
+    """Hash password using SHA256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(password, password_hash):
+    """Verify password against hash"""
+    return hash_password(password) == password_hash
+
+def login_required(f):
+    """Decorator to require login for protected endpoints"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return jsonify({'error': 'Unauthorized', 'message': 'Please login first'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 # === USB Mount Management ===
 BASE_MOUNT_DIR = "/mnt"
@@ -430,6 +461,161 @@ def shutdown():
     logging.warning("⚠️ Shutdown requested!")
     os.system('sudo shutdown now')
     return '', 204
+
+
+
+
+# === Authentication Endpoints ===
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    """Login endpoint for configuration management"""
+    try:
+        data = request.get_json()
+        username = data.get('username', '')
+        password = data.get('password', '')
+        
+        if not username or not password:
+            return jsonify({'success': False, 'message': 'Username and password required'}), 400
+        
+        # Check credentials
+        if username == DEFAULT_USERNAME and verify_password(password, DEFAULT_PASSWORD_HASH):
+            session['username'] = username
+            session.permanent = True
+            logging.info(f"✅ User '{username}' logged in successfully")
+            return jsonify({'success': True, 'message': 'Login successful'})
+        else:
+            logging.warning(f"⚠️ Failed login attempt for user '{username}'")
+            return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
+    except Exception as e:
+        logging.error(f"Login error: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    """Logout endpoint"""
+    try:
+        username = session.get('username', 'unknown')
+        session.clear()
+        logging.info(f"✅ User '{username}' logged out")
+        return jsonify({'success': True, 'message': 'Logout successful'})
+    except Exception as e:
+        logging.error(f"Logout error: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/auth/status')
+def auth_status():
+    """Check current authentication status"""
+    if 'username' in session:
+        return jsonify({'authenticated': True, 'username': session['username']})
+    return jsonify({'authenticated': False})
+
+
+@app.route('/api/config/read')
+@login_required
+def read_config():
+    """Read env configuration file and return as JSON"""
+    try:
+        config = {}
+        env_path = "/opt/logix/config/env"
+        
+        if not os.path.exists(env_path):
+            return jsonify({"error": "Configuration file not found"}), 404
+        
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                # Skip empty lines and comments
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Parse key=value
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    # Remove quotes if present
+                    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+                        value = value[1:-1]
+                    config[key] = value
+        
+        return jsonify(config)
+    except Exception as e:
+        logging.error(f"Error reading config: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/config/write', methods=['POST'])
+@login_required
+def write_config():
+    """Write configuration to env file"""
+    try:
+        data = request.get_json()
+        env_path = "/opt/logix/config/env"
+        
+        if not os.path.exists(env_path):
+            return jsonify({"success": False, "message": "Configuration file not found"}), 404
+        
+        # Read original file to preserve structure and comments
+        original_lines = []
+        with open(env_path, 'r') as f:
+            original_lines = f.readlines()
+        
+        # Create a mapping of existing keys
+        updated_keys = set()
+        new_lines = []
+        
+        for line in original_lines:
+            stripped = line.strip()
+            
+            # Preserve empty lines and comments
+            if not stripped or stripped.startswith('#'):
+                new_lines.append(line)
+                continue
+            
+            # Parse key=value
+            if '=' in stripped:
+                key = stripped.split('=', 1)[0].strip()
+                
+                if key in data:
+                    # Update the value
+                    value = data[key]
+                    # Check if original value had quotes
+                    if '="' in stripped or "='" in stripped:
+                        new_lines.append(f'{key}="{value}"\n')
+                    else:
+                        new_lines.append(f'{key}={value}\n')
+                    updated_keys.add(key)
+                else:
+                    # Keep original line
+                    new_lines.append(line)
+            else:
+                new_lines.append(line)
+        
+        # Add any new keys that weren't in the original file
+        for key, value in data.items():
+            if key not in updated_keys:
+                new_lines.append(f'{key}="{value}"\n')
+        
+        # Write back to file
+        with open(env_path, 'w') as f:
+            f.writelines(new_lines)
+        
+        
+        logging.info(f"✅ Configuration updated: {', '.join(data.keys())}")
+
+        
+        return jsonify({
+            "success": True,
+            "message": f"Configuration saved successfully.{restart_message}",
+            "updated_keys": list(updated_keys),
+            "new_keys": [k for k in data.keys() if k not in updated_keys]
+        })
+    except Exception as e:
+        logging.error(f"Error writing config: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 if __name__ == "__main__":

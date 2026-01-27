@@ -27,51 +27,71 @@ DB_PASSWORD="logix"
 # =====================================================
 
 # --- Sensor AT500 ---
-AT500_STATUS="inactive"             # Options: active / inactive
+# Options: active / inactive
+AT500_STATUS="inactive"            
 AT500_PORT="/dev/ttyAMA3"
 
 # --- Sensor RT200 ---
-RT200_STATUS="inactive"             # Options: active / inactive
+# Options: active / inactive
+RT200_STATUS="inactive"             
 RT200_PORT="/dev/ttyAMA4"
 
 # --- Sensor SEM5096 ---
-SEM5096_STATUS="active"           # Options: active / inactive
+# Options: active / inactive
+SEM5096_STATUS="inactive"           
 SEM5096_PORT="/dev/ttyS0"
 
 # --- Sensor MACE ---
-MACE_STATUS="inactive"              # Options: active / inactive
+# Options: active / inactive
+MACE_STATUS="inactive"              
 MACE_PORT="/dev/ttyAMA5"
 
 # --- Sensor ISCAN ---
-ISCAN_STATUS="inactive"              # Options: active / inactive
+# Options: active / inactive
+ISCAN_STATUS="inactive"              
 ISCAN_PORT="/dev/ttyAMA5"
 
 
 # --- Sensor LTNC ---
-LTNC_STATUS="inactive"              # Options: active / inactive
+ # Options: active / inactive
+LTNC_STATUS="active"             
 LTNC_PORT="/dev/ttyAMA5"
 
 
 # --- Sensor SPECTRO ---
-SPECTRO_STATUS="inactive"           # Options: active / inactive
+# Options: active / inactive
+SPECTRO_STATUS="inactive"           
 SPECTRO_IP="192.168.1.100"
 SPECTRO_PORT="502"
 
 # --- Sensor CONTLYTE ---
-CONTLYTE_STATUS="inactive"          # Options: active / inactive
+# Options: active / inactive
+CONTLYTE_STATUS="inactive"          
 CONTLYTE_PORT="/dev/ttyAMA5"
+
+# --- Sensor DS502 ---
+# Options: active / inactive
+DS502_STATUS="active"            
+DS502_PORT="/dev/ttyAMA5"
 
 
 # --- Sensor GPIO ARG314 ---
-ARG314_STATUS="inactive"            # Options: active / inactive
-RAIN_SENSOR_PIN="18"       # BCM pin untuk sensor tipping bucket
-RESOLUTION="0.202"          # mm per tipping
-DEBOUNCE_MS="200"           # debounce dalam milidetik
-DEMO_MODE="active"         # Options: active / inactive (jika active maka data curah hujan random)
-GPIO_MODULE="Rpi.GPIO"    # Options: Rpi.GPIO / lgpio
+# Options: active / inactive
+ARG314_STATUS="inactive"
+# BCM pin untuk sensor tipping bucket            
+RAIN_SENSOR_PIN="18" 
+# mm per tipping      
+RESOLUTION="0.202"
+# debounce dalam milidetik          
+DEBOUNCE_MS="200"
+# Options: active / inactive (jika active maka data curah hujan random)           
+DEMO_MODE="active"
+# Options: Rpi.GPIO / lgpio        
+GPIO_MODULE="Rpi.GPIO"    
 
 # --- Sensor Interval ---
-DELAY="1"                           # Delay pembacaan (menit)
+# Delay pembacaan (menit)
+DELAY="2"                           
 
 # =====================================================
 #                 KLHK API CONFIGURATION
@@ -82,20 +102,25 @@ KLHK_API_URL="https://sparing.kemenlh.go.id/api/send-hourly-vendor"
 KLHK_TOKEN_URL="https://sparing.kemenlh.go.id/api/secret-sensor"
 KLHK_UID="6d0e75e621cee16dfadfe1s"
 
-KLHK_FIELDS="datetime,pH,cod,tss,nh3n,flow"   # Parameter yang dikirim
-KLHK_MAX_DUP_RETRY="3"                        # Maks percobaan kirim ulang data duplikat
-KLHK_TARGET_MINUTE="10"                        # Target menit kirim ulang
+# Parameter yang dikirim
+KLHK_FIELDS="datetime,pH,cod,tss,nh3n,flow"
+# Maks percobaan kirim ulang data duplikat   
+KLHK_MAX_DUP_RETRY="3"
+# Target menit kirim ulang                        
+KLHK_TARGET_MINUTE="10"                        
 
 
 
 # =====================================================
 #                 HAS API CONFIGURATION
 # =====================================================
-
-HAS_STATUS="active"              # Options: active / inactive
+# Options: active / inactive
+HAS_STATUS="active"             
 HAS_API_URL="https://api.hasportal.com/api/v1/data"
-HAS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4 # Token API HASsssss
-HAS_FIELDS="datetime,atemp,apress,hum,wspeed,wdir,rain,srad"   # Parameter yang dikirim
+# Token API HAS
+HAS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4
+# Parameter yang dikirim
+HAS_FIELDS="datetime,pH,cod,tss,nh3n,flow,wtemp,orp,turb,tds,conduct,do,depth,bod,wpress"  
 
 
 
@@ -103,7 +128,8 @@ HAS_FIELDS="datetime,atemp,apress,hum,wspeed,wdir,rain,srad"   # Parameter yang 
 #                 HAS LOGS API CONFIGURATION
 # =====================================================
 HAS_LOGS_API_URL="https://api.hasportal.com/api/v1/logs"
-HAS_LOGS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4 # Token API HAS
+# Token API HAS
+HAS_LOGS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4
 
 
 
@@ -140,18 +166,18 @@ SATUAN_SRAD="W/m2"
 
 
 # Daftar Parameter yang tersedia
-# "pH,cod,tss,nh3n,flow,temp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,press,hum,wspeed,wdir,rain,srad"
+#"pH,cod,tss,nh3n,flow,atemp,wtemp,orp,turb,tds,conduct,do,salinity,battery,depth,tflow,no3,bod,apress,wpress,hum,wspeed,wdir,rain,srad"
 
 # Parameter yang ditampilkan di dashboard
-PARAMETERS="atemp,apress,hum,wspeed,wdir,rain,srad"
+PARAMETERS="pH,cod,tss,nh3n,flow,wtemp,orp,turb,tds,conduct,do,depth,bod,wpress"
 
 # Deteksi Gap data web (menit) jika tidak ada sensor maka akan dibuat terputus, GAP_WEB adaalah penambahan 1 menit dari delay 
 GAP_WEB="3"
 
-WEB_TITLE="AWS"
-WEB_NAME="Automatic Weather Station"
+WEB_TITLE="WQMS"
+WEB_NAME="Water Quality Monitoring System"
 
-DEVICE_ID="HSC-2505X001"
+DEVICE_ID="HSP-2505X001"
 LOCATION_NAME="PT. Has Environmental"
 
 SOFTWARE_VERSION="1.0.0"

@@ -11,6 +11,7 @@ from config import insert_data, ambilDate, ambilDateTime
 from datetime import datetime
 from dotenv import load_dotenv
 from contlyte import get_conlyte_data
+from ds502 import get_ds502_data
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 import sqlite3
 import pytz
@@ -32,6 +33,7 @@ ARG314_STATUS = os.getenv('ARG314_STATUS')
 ISCAN_STATUS = os.getenv('ISCAN_STATUS')
 LTNC_STATUS = os.getenv('LTNC_STATUS')
 CONTLYTE_STATUS = os.getenv('CONTLYTE_STATUS')
+DS502_STATUS = os.getenv('DS502_STATUS')
 
 # SQLite Database GPIO
 DB_PATH = os.getenv("SQLITE_DB_PATH", "/opt/logix/data/gpio_logix.db")
@@ -250,6 +252,34 @@ def main():
                         else:
                             status_filter = False
                             print(f"[{current_date}] ⚠️ Gagal membaca data CONTLYTE.")
+
+                    
+                    # === DS502 ===
+                    if DS502_STATUS.lower() == "active":
+                        ds502_data = get_ds502_data()
+                        if ds502_data:
+                            (new_ph, new_orp, new_do, new_turb, new_tss, new_conduct, new_tds,
+                             new_nh3n, new_cod, new_bod, new_temp, new_wpress, new_depth) = ds502_data
+                            # Update global variables only if new data is not None
+                            ph = new_ph if new_ph is not None else ph
+                            orp = new_orp if new_orp is not None else orp
+                            do = new_do if new_do is not None else do
+                            turb = new_turb if new_turb is not None else turb
+                            tss = new_tss if new_tss is not None else tss
+                            conduct = new_conduct if new_conduct is not None else conduct
+                            tds = new_tds if new_tds is not None else tds
+                            nh3n = new_nh3n if new_nh3n is not None else nh3n
+                            cod = new_cod if new_cod is not None else cod
+                            bod = new_bod if new_bod is not None else bod
+                            wtemp = new_temp if new_temp is not None else wtemp
+                            wpress = new_wpress if new_wpress is not None else wpress
+                            depth = new_depth if new_depth is not None else depth
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data DS502.")
+
+
+
                     
                     # === GPIO Sensors ARG314 ===
                     if ARG314_STATUS.lower() == "active":
@@ -262,7 +292,7 @@ def main():
                     # Save data if all active sensors were read successfully
                     if status_filter:
                         # Check if any sensor is active
-                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, ARG314_STATUS]):
+                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, ARG314_STATUS, DS502_STATUS]):
                             send_sensor_log("Semua modul sensor tidak aktif. Melewati penyimpanan data.")
                             print(f"[{current_date}] ⚠️ Semua modul sensor tidak aktif. Melewati penyimpanan data.")
 
