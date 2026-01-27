@@ -118,7 +118,7 @@ KLHK_TARGET_MINUTE="10"
 HAS_STATUS="active"             
 HAS_API_URL="https://api.hasportal.com/api/v1/data"
 # Token API HAS
-HAS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4
+HAS_TOKEN_API=f1cf506cd906810c5eb47e22fd
 # Parameter yang dikirim
 HAS_FIELDS="datetime,pH,cod,tss,nh3n,flow,wtemp,orp,turb,tds,conduct,do,depth,bod,wpress"  
 
@@ -129,7 +129,7 @@ HAS_FIELDS="datetime,pH,cod,tss,nh3n,flow,wtemp,orp,turb,tds,conduct,do,depth,bo
 # =====================================================
 HAS_LOGS_API_URL="https://api.hasportal.com/api/v1/logs"
 # Token API HAS
-HAS_LOGS_TOKEN_API=f1cf506cd906810c5eb47e220ff0b6a4
+HAS_LOGS_TOKEN_API=f1cf506cd906810c5eb47e220fffg
 
 
 
