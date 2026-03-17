@@ -343,6 +343,10 @@
     .section-group:last-child {
       border-bottom: none;
     }
+
+    #restartOverlay[style*="display: flex"] {
+      display: flex !important;
+    }
   </style>
 </head>
 
@@ -389,12 +393,77 @@
         </div>
 
         <div id="alert-container"></div>
+
+        <!-- Loading Overlay for Restart -->
+        <div id="restartOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; align-items: center; justify-content: center;">
+          <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); max-width: 500px;">
+            <div style="margin-bottom: 20px;">
+              <div class="spinner" style="margin: 0 auto; border: 4px solid #f3f3f3; border-top: 4px solid var(--secondary); width: 50px; height: 50px;"></div>
+            </div>
+            <h4 style="color: var(--primary-dark); margin-bottom: 10px;">
+              <i class="bi bi-hourglass-split"></i> Sistem Sedang Restart
+            </h4>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+              Mohon tunggu, sistem sedang melakukan restart dan akan siap dalam beberapa saat...
+            </p>
+            <div style="font-size: 28px; font-weight: bold; color: var(--secondary); margin-bottom: 15px;">
+              <span id="countdownTimer">120</span>s
+            </div>
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              Halaman akan refresh otomatis setelah sistem siap.
+            </p>
+          </div>
+        </div>
         
         <!-- Reboot Warning -->
         <div class="alert alert-warning" id="rebootWarning" style="display: none; margin-bottom: 15px; border-radius: 6px;">
           <i class="bi bi-exclamation-triangle-fill me-2"></i>
           <span><strong>⚠️ Perhatian:</strong> Konfigurasi telah diubah. Sistem memerlukan <strong>reboot</strong> untuk menerapkan perubahan. Klik tombol "Reboot" di atas.</span>
         </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 10000; align-items: center; justify-content: center;">
+          <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); max-width: 450px; animation: slideUp 0.3s ease;">
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+              <div id="confirmIcon" style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 15px; background-color: #f0f4f8;"></div>
+              <h5 id="confirmTitle" style="margin: 0; color: var(--primary-dark); font-weight: 600;"></h5>
+            </div>
+            <p id="confirmMessage" style="color: #666; margin: 0 0 25px 0; line-height: 1.6; font-size: 14px;"></p>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button id="confirmCancelBtn" style="background-color: #e0e0e0; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s ease;">
+              </button>
+              <button id="confirmOkBtn" style="background-color: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s ease;">
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <style>
+          @keyframes slideUp {
+            from {
+              transform: translateY(30px);
+              opacity: 0;
+            }
+            to {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+          
+          #confirmationModal[style*="flex"] {
+            display: flex !important;
+          }
+          
+          #confirmCancelBtn:hover {
+            background-color: #d0d0d0;
+          }
+          
+          #confirmOkBtn:hover {
+            background-color: #0288d1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 169, 244, 0.3);
+          }
+        </style>
 
         <div class="config-container">
           <div class="config-section">
@@ -635,6 +704,122 @@
                   </div>
                 </div>
 
+
+                <!-- AMMONIA -->
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
+                  <h6 style="color: var(--primary-dark); margin-bottom: 12px;">AMMONIA</h6>
+                  <div class="row-form">
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select class="form-control" name="AMMONIA_STATUS" id="AMMONIA_STATUS">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Port</label>
+                      <input type="text" class="form-control" name="AMMONIA200_PORT" id="AMMONIA200_PORT">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- COD200X -->
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
+                  <h6 style="color: var(--primary-dark); margin-bottom: 12px;">COD200X</h6>
+                  <div class="row-form">
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select class="form-control" name="COD200X_STATUS" id="COD200X_STATUS">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Port</label>
+                      <input type="text" class="form-control" name="COD200X_PORT" id="COD200X_PORT">
+                    </div>
+                  </div>
+                </div>
+
+
+                <!-- H1601 -->
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
+                  <h6 style="color: var(--primary-dark); margin-bottom: 12px;">H1601</h6>
+                  <div class="row-form">
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select class="form-control" name="H1601_STATUS" id="H1601_STATUS">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Port</label>
+                      <input type="text" class="form-control" name="H1601_PORT" id="H1601_PORT">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PH200X -->
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
+                  <h6 style="color: var(--primary-dark); margin-bottom: 12px;">PH200</h6>
+                  <div class="row-form">
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select class="form-control" name="PH200_STATUS" id="PH200_STATUS">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Port</label>
+                      <input type="text" class="form-control" name="PH200_PORT" id="PH200_PORT">
+                    </div>
+                  </div>
+                </div>
+                
+
+                <!-- TSS200X -->
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
+                  <h6 style="color: var(--primary-dark); margin-bottom: 12px;">TSS200X</h6>
+                  <div class="row-form">
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select class="form-control" name="TSS200X_STATUS" id="TSS200X_STATUS">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Port</label>
+                      <input type="text" class="form-control" name="TSS200X_PORT" id="TSS200X_PORT">
+                    </div>
+                  </div>
+                </div>
+
+
+                <!-- XYMD02 (Test Sensor) -->
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
+                  <h6 style="color: var(--primary-dark); margin-bottom: 12px;">XYMD02 (Test Sensor)</h6>
+                  <div class="row-form">
+                    <div class="form-group">
+                      <label class="form-label">Status</label>
+                      <select class="form-control" name="XYMD02_STATUS" id="XYMD02_STATUS">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Port</label>
+                      <input type="text" class="form-control" name="XYMD02_PORT" id="XYMD02_PORT">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">SLAVE ID</label>
+                      <input type="text" class="form-control" name="XYMD02_SLAVE_ID" id="XYMD02_SLAVE_ID">
+                    </div>
+                  </div>
+                </div>
+
                 <!-- ARG314 (GPIO) -->
                 <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 6px;">
                   <h6 style="color: var(--primary-dark); margin-bottom: 12px;">ARG314 (GPIO Rain Sensor)</h6>
@@ -837,41 +1022,274 @@
   </div>
 
   <script>
+    // Show auto restart confirmation with countdown
+    function showAutoRestartConfirmation() {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirmationModal');
+        const titleEl = document.getElementById('confirmTitle');
+        const messageEl = document.getElementById('confirmMessage');
+        const iconEl = document.getElementById('confirmIcon');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        const okBtn = document.getElementById('confirmOkBtn');
+        
+        let countdown = 10;
+        let countdownInterval;
+        
+        // Set content
+        titleEl.textContent = '⏱️ Restart Otomatis';
+        iconEl.innerHTML = '<i class="bi bi-arrow-repeat" style="color: var(--secondary); font-size: 28px;"></i>';
+        
+        // Initial message
+        const updateMessage = () => {
+          messageEl.textContent = `Sistem akan restart dalam ${countdown} detik untuk menerapkan konfigurasi. Anda bisa restart sekarang atau tunggu countdown selesai.`;
+          okBtn.innerHTML = `<i class="bi bi-lightning-fill"></i> Restart Sekarang (${countdown}s)`;
+        };
+        
+        updateMessage();
+        
+        // Show modal
+        modal.style.display = 'flex';
+        
+        // Start countdown
+        countdownInterval = setInterval(() => {
+          countdown--;
+          updateMessage();
+          
+          if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            // Auto restart
+            handleOk();
+          }
+        }, 1000);
+        
+        // Handle buttons
+        const handleOk = () => {
+          modal.style.display = 'none';
+          clearInterval(countdownInterval);
+          // Trigger reboot immediately
+          performRestart();
+          resolve(true);
+          cleanup();
+        };
+        
+        const handleCancel = () => {
+          modal.style.display = 'none';
+          clearInterval(countdownInterval);
+          resolve(false);
+          cleanup();
+        };
+        
+        const cleanup = () => {
+          okBtn.removeEventListener('click', handleOk);
+          cancelBtn.removeEventListener('click', handleCancel);
+          document.removeEventListener('keydown', handleEscape);
+        };
+        
+        const handleEscape = (e) => {
+          if (e.key === 'Escape') handleCancel();
+        };
+        
+        okBtn.addEventListener('click', handleOk);
+        cancelBtn.addEventListener('click', handleCancel);
+        document.addEventListener('keydown', handleEscape);
+        cancelBtn.innerHTML = '<i class="bi bi-pause-circle"></i> Tunda Restart';
+        
+        // Focus on OK button
+        okBtn.focus();
+      });
+    }
+
+    // Perform restart operation
+    async function performRestart() {
+      try {
+        const response = await fetch('/api/system/restart', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          // Show loading overlay
+          showRestartLoading();
+          
+          const alertContainer = document.getElementById('alert-container');
+          const rebootWarning = document.getElementById('rebootWarning');
+          const rebootNowBtn = document.getElementById('rebootNowBtn');
+          
+          // Hide alerts and warning
+          alertContainer.innerHTML = '';
+          if (rebootWarning) rebootWarning.style.display = 'none';
+          if (rebootNowBtn) rebootNowBtn.style.display = 'none';
+        } else {
+          showConfirmation(
+            '❌ Restart Gagal',
+            'Gagal melakukan restart. Silahkan coba lagi.',
+            '<i class="bi bi-exclamation-circle" style="color: #ff6b6b; font-size: 28px;"></i>',
+            null,
+            'OK',
+            ''
+          );
+        }
+      } catch (error) {
+        console.error('Restart error:', error);
+        showConfirmation(
+          '❌ Error',
+          'Terjadi kesalahan: ' + error.message,
+          '<i class="bi bi-x-circle" style="color: #ff6b6b; font-size: 28px;"></i>',
+          null,
+          'OK',
+          ''
+        );
+      }
+    }
+
+    // Show confirmation modal
+    function showConfirmation(title, message, icon, onConfirm, confirmText = 'Ya, Lanjutkan', cancelText = 'Batal') {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirmationModal');
+        const titleEl = document.getElementById('confirmTitle');
+        const messageEl = document.getElementById('confirmMessage');
+        const iconEl = document.getElementById('confirmIcon');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        const okBtn = document.getElementById('confirmOkBtn');
+        
+        // Set content
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        iconEl.innerHTML = icon;
+        okBtn.innerHTML = '<i class="bi bi-check-lg"></i> ' + confirmText;
+        cancelBtn.innerHTML = '<i class="bi bi-x-lg"></i> ' + cancelText;
+        
+        // Show modal
+        modal.style.display = 'flex';
+        
+        // Handle buttons
+        const handleOk = () => {
+          modal.style.display = 'none';
+          if (onConfirm) onConfirm();
+          resolve(true);
+          cleanup();
+        };
+        
+        const handleCancel = () => {
+          modal.style.display = 'none';
+          resolve(false);
+          cleanup();
+        };
+        
+        const cleanup = () => {
+          okBtn.removeEventListener('click', handleOk);
+          cancelBtn.removeEventListener('click', handleCancel);
+          document.removeEventListener('keydown', handleEscape);
+        };
+        
+        const handleEscape = (e) => {
+          if (e.key === 'Escape') handleCancel();
+        };
+        
+        okBtn.addEventListener('click', handleOk);
+        cancelBtn.addEventListener('click', handleCancel);
+        document.addEventListener('keydown', handleEscape);
+        
+        // Focus on cancel button
+        cancelBtn.focus();
+      });
+    }
+
+    // Show restart loading overlay
+    function showRestartLoading() {
+      const overlay = document.getElementById('restartOverlay');
+      overlay.style.display = 'flex';
+      
+      // Disable all buttons and form interactions
+      disableAllInteractions(true);
+      
+      // Start countdown timer (2 minutes = 120 seconds)
+      let countdown = 120;
+      const countdownElement = document.getElementById('countdownTimer');
+      
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+        
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          // Refresh the page
+          window.location.reload();
+        }
+      }, 1000);
+    }
+    
+    // Disable/enable all interactions
+    function disableAllInteractions(disable) {
+      const form = document.getElementById('configForm');
+      const buttons = document.querySelectorAll('button');
+      const inputs = document.querySelectorAll('input, select, textarea');
+      
+      if (disable) {
+        // Disable all
+        buttons.forEach(btn => btn.disabled = true);
+        inputs.forEach(input => input.disabled = true);
+        form.style.opacity = '0.5';
+        form.style.pointerEvents = 'none';
+      } else {
+        // Enable all
+        buttons.forEach(btn => btn.disabled = false);
+        inputs.forEach(input => input.disabled = false);
+        form.style.opacity = '1';
+        form.style.pointerEvents = 'auto';
+      }
+    }
+
     // Reboot system function
     async function rebootSystem() {
-      if (confirm('⚠️ Sistem akan di-reboot. Apakah Anda yakin?\n\nKoneksi akan terputus selama beberapa saat.')) {
-        try {
-          const response = await fetch('/api/system/restart', {
-            method: 'POST',
-            credentials: 'include'
-          });
-          
-          if (response.ok) {
-            const alertContainer = document.getElementById('alert-container');
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-success';
-            alert.innerHTML = '<i class="bi bi-check-circle"></i><span>Sistem akan di-reboot dalam beberapa detik...</span>';
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alert);
+      showConfirmation(
+        '⚠️ Konfirmasi Reboot',
+        'Sistem akan melakukan restart. Koneksi akan terputus selama beberapa saat. Apakah Anda yakin ingin melanjutkan?',
+        '<i class="bi bi-exclamation-triangle-fill" style="color: #ff6b6b; font-size: 28px;"></i>',
+        async () => {
+          try {
+            const response = await fetch('/api/system/restart', {
+              method: 'POST',
+              credentials: 'include'
+            });
             
-            // Hide reboot warning and button after successful reboot command
-            const rebootWarning = document.getElementById('rebootWarning');
-            const rebootNowBtn = document.getElementById('rebootNowBtn');
-            if (rebootWarning) rebootWarning.style.display = 'none';
-            if (rebootNowBtn) rebootNowBtn.style.display = 'none';
-            
-            // Redirect to login after a few seconds
-            setTimeout(() => {
-              window.location.href = '/config-login.html';
-            }, 3000);
-          } else {
-            alert('Gagal melakukan reboot. Silahkan coba lagi.');
+            if (response.ok) {
+              // Show loading overlay
+              showRestartLoading();
+              
+              const alertContainer = document.getElementById('alert-container');
+              const rebootWarning = document.getElementById('rebootWarning');
+              const rebootNowBtn = document.getElementById('rebootNowBtn');
+              
+              // Hide alerts and warning
+              alertContainer.innerHTML = '';
+              if (rebootWarning) rebootWarning.style.display = 'none';
+              if (rebootNowBtn) rebootNowBtn.style.display = 'none';
+            } else {
+              showConfirmation(
+                '❌ Reboot Gagal',
+                'Gagal melakukan reboot. Silahkan coba lagi.',
+                '<i class="bi bi-exclamation-circle" style="color: #ff6b6b; font-size: 28px;"></i>',
+                null,
+                'OK',
+                ''
+              );
+            }
+          } catch (error) {
+            console.error('Reboot error:', error);
+            showConfirmation(
+              '❌ Error',
+              'Terjadi kesalahan: ' + error.message,
+              '<i class="bi bi-x-circle" style="color: #ff6b6b; font-size: 28px;"></i>',
+              null,
+              'OK',
+              ''
+            );
           }
-        } catch (error) {
-          console.error('Reboot error:', error);
-          alert('Error: ' + error.message);
-        }
-      }
+        },
+        'Ya, Reboot Sekarang',
+        'Batal'
+      );
     }
 
     // Logout function
@@ -1019,12 +1437,15 @@
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            showAlert('✅ Configuration saved successfully! ' + data.message, 'success');
+            showAlert('✅ Configuration saved successfully! System will restart automatically.', 'success');
             statusBadge.textContent = 'Saved';
             // Show reboot warning
             showRebootWarning();
             // Update original config
             originalConfig = JSON.parse(JSON.stringify(config));
+            
+            // Auto restart after successful save with countdown confirmation
+            showAutoRestartConfirmation();
           } else {
             showAlert(data.message || 'Failed to save configuration', 'error');
             statusBadge.textContent = 'Ready';
@@ -1042,9 +1463,14 @@
 
       // Reset form
       resetBtn.addEventListener('click', function () {
-        if (confirm('Are you sure you want to reload the configuration from file?')) {
-          loadConfig();
-        }
+        showConfirmation(
+          '🔄 Konfirmasi Reset',
+          'Apakah Anda yakin ingin memuat ulang konfigurasi dari file? Perubahan yang belum disimpan akan hilang.',
+          '<i class="bi bi-arrow-counterclockwise" style="color: var(--secondary); font-size: 28px;"></i>',
+          () => loadConfig(),
+          'Ya, Muat Ulang',
+          'Batal'
+        );
       });
 
       // Load config on page load

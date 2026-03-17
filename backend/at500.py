@@ -2,7 +2,6 @@ import serial
 import struct
 import time
 import os
-from config import ambilDataTerakhir 
 from dotenv import load_dotenv
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 

@@ -12,6 +12,12 @@ from datetime import datetime
 from dotenv import load_dotenv
 from contlyte import get_conlyte_data
 from ds502 import get_ds502_data
+from ammonia200 import get_ammonia200_data
+from cod200x import get_cod200x_data
+from h1601 import get_h1601_data
+from ph200 import get_ph200_data
+from tss200x import get_tss200x_data
+from xymd02 import get_xymd02_data
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 import sqlite3
 import pytz
@@ -24,16 +30,22 @@ if not load_dotenv(dotenv_path=env_path):
 
 # Configuration from environment variables
 DELAY = int(os.getenv('DELAY'))
-AT500_STATUS = os.getenv('AT500_STATUS')
-MACE_STATUS = os.getenv('MACE_STATUS')
-SPECTRO_STATUS = os.getenv('SPECTRO_STATUS')
-RT200_STATUS = os.getenv('RT200_STATUS')
-SEM5096_STATUS = os.getenv('SEM5096_STATUS')
-ARG314_STATUS = os.getenv('ARG314_STATUS')
-ISCAN_STATUS = os.getenv('ISCAN_STATUS')
-LTNC_STATUS = os.getenv('LTNC_STATUS')
-CONTLYTE_STATUS = os.getenv('CONTLYTE_STATUS')
-DS502_STATUS = os.getenv('DS502_STATUS')
+AT500_STATUS = os.getenv('AT500_STATUS', 'inactive')
+MACE_STATUS = os.getenv('MACE_STATUS', 'inactive')
+SPECTRO_STATUS = os.getenv('SPECTRO_STATUS', 'inactive')
+RT200_STATUS = os.getenv('RT200_STATUS', 'inactive')
+SEM5096_STATUS = os.getenv('SEM5096_STATUS', 'inactive')
+ARG314_STATUS = os.getenv('ARG314_STATUS', 'inactive')
+ISCAN_STATUS = os.getenv('ISCAN_STATUS', 'inactive')
+LTNC_STATUS = os.getenv('LTNC_STATUS', 'inactive')
+CONTLYTE_STATUS = os.getenv('CONTLYTE_STATUS', 'inactive')
+DS502_STATUS = os.getenv('DS502_STATUS', 'inactive')
+AMMONIA200_STATUS = os.getenv('AMMONIA200_STATUS', 'inactive')
+COD200X_STATUS = os.getenv('COD200X_STATUS', 'inactive')
+H1601_STATUS = os.getenv('H1601_STATUS', 'inactive')
+PH200_STATUS = os.getenv('PH200_STATUS', 'inactive')
+TSS200X_STATUS = os.getenv('TSS200X_STATUS', 'inactive')
+XYMD02_STATUS = os.getenv('XYMD02_STATUS', 'inactive')
 
 # SQLite Database GPIO
 DB_PATH = os.getenv("SQLITE_DB_PATH", "/opt/logix/data/gpio_logix.db")
@@ -279,8 +291,69 @@ def main():
                             print(f"[{current_date}] ⚠️ Gagal membaca data DS502.")
 
 
-
+                    # === AMMONIA200 ===
+                    if AMMONIA200_STATUS.lower() == "active":
+                        ammonia200_data = get_ammonia200_data()
+                        if ammonia200_data is not None:
+                            nh3n = ammonia200_data if ammonia200_data is not None else nh3n
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data Ammonia200.")
                     
+                    # === COD200X ===
+                    if COD200X_STATUS.lower() == "active":
+                        cod200x_data = get_cod200x_data()
+                        if cod200x_data is not None:
+                            cod = cod200x_data if cod200x_data is not None else cod
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data COD200X.")
+
+                    # === H1601 ===
+                    if H1601_STATUS.lower() == "active":
+                        h1601_data = get_h1601_data()
+                        if h1601_data:
+                            new_depth, new_flow = h1601_data
+                            depth = new_depth if new_depth is not None else depth
+                            flow = new_flow if new_flow is not None else flow
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data H1601.")
+
+                    # === PH200 ===
+                    if PH200_STATUS.lower() == "active":
+                        ph200_data = get_ph200_data()
+                        if ph200_data:
+                            new_ph, new_wtemp = ph200_data
+                            ph = new_ph if new_ph is not None else ph
+                            wtemp = new_wtemp if new_wtemp is not None else wtemp
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data PH200.")
+
+                    # === TSS200X ===
+                    if TSS200X_STATUS.lower() == "active":
+                        tss200x_data = get_tss200x_data()
+                        if tss200x_data:
+                            new_tss = tss200x_data
+                            tss = new_tss if new_tss is not None else tss
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data TSS200X.")
+
+
+                    # === XYMD02 ===
+                    if XYMD02_STATUS.lower() == "active":
+                        xymd02_data = get_xymd02_data()
+                        if xymd02_data:
+                            new_atemp, new_hum = xymd02_data
+                            atemp = new_atemp if new_atemp is not None else atemp
+                            hum = new_hum if new_hum is not None else hum
+                        else:
+                            status_filter = False
+                            print(f"[{current_date}] ⚠️ Gagal membaca data XYMD02.")
+
+
                     # === GPIO Sensors ARG314 ===
                     if ARG314_STATUS.lower() == "active":
                         time.sleep(4)   #jika GPIO aktif delay 4 detik agar tidak bentrok saat pengambilan data
@@ -292,7 +365,7 @@ def main():
                     # Save data if all active sensors were read successfully
                     if status_filter:
                         # Check if any sensor is active
-                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, ARG314_STATUS, DS502_STATUS]):
+                        if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, ARG314_STATUS, DS502_STATUS, AMMONIA200_STATUS, COD200X_STATUS, H1601_STATUS, PH200_STATUS, TSS200X_STATUS, XYMD02_STATUS]):
                             send_sensor_log("Semua modul sensor tidak aktif. Melewati penyimpanan data.")
                             print(f"[{current_date}] ⚠️ Semua modul sensor tidak aktif. Melewati penyimpanan data.")
 

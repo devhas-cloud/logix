@@ -106,7 +106,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 
 # Default credentials - change these in production
 DEFAULT_USERNAME = 'admin'
-DEFAULT_PASSWORD_HASH = hashlib.sha256('Has123456'.encode()).hexdigest()
+DEFAULT_PASSWORD_HASH = hashlib.sha256('has123456'.encode()).hexdigest()
 
 def hash_password(password):
     """Hash password using SHA256"""
@@ -453,7 +453,10 @@ def connect_wifi():
 def restart():
     logging.warning("⚠️ Restart requested!")
     os.system('sudo reboot')
-    return '', 204
+    return jsonify({
+        "success": True,
+        "message": "System restart initiated. Please wait..."
+    }), 200
 
 
 @app.route('/api/system/shutdown', methods=['POST'])
@@ -609,7 +612,7 @@ def write_config():
         
         return jsonify({
             "success": True,
-            "message": f"Configuration saved successfully.{restart_message}",
+            "message": "Configuration saved successfully. System will restart automatically.",
             "updated_keys": list(updated_keys),
             "new_keys": [k for k in data.keys() if k not in updated_keys]
         })
