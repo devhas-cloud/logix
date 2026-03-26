@@ -61,7 +61,7 @@ def get_ammonia200_data():
     
     try:
         print("[INFO] Modul Ammonia200 aktif. Melakukan pembacaan data.")
-        return read_modbus(AMMONIA200_PORT, bytearray([0x01, 0x03, 0x00, 0x82, 0x00, 0x02]))
+        return read_modbus(AMMONIA200_PORT, bytearray([0x04, 0x03, 0x00, 0x82, 0x00, 0x02]))
     except Exception as e:
         print(f"Error saat membaca data Ammonia200: {e}")
         send_sensor_log(f"Error saat membaca data Ammonia200: {e}")
