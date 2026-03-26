@@ -65,7 +65,8 @@ def get_jwt_token():
 
 def ambil_data():
     global duplicate_attempt
-    now = datetime.now(tz)
+    now = datetime.now(tz).replace(second=0, microsecond=0) # selalu di detik 00
+    now = now.strftime("%Y-%m-%d %H:%M:%S")
     grouped_data = defaultdict(list)
 
     try:
