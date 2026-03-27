@@ -3,19 +3,19 @@ import os
 from dotenv import load_dotenv
 
 # === Load env ===
-env_path = "/opt/logix/config/env"
+env_path = "/home/pi/logix/config/.env"
 if not load_dotenv(dotenv_path=env_path):
     print(f"❌ env file not found at {env_path}")
     exit(1)
 
 LOG_FILES = {
-    'web': '/opt/logix/logs/web.log',
-    'sensor': '/opt/logix/logs/sensor.log',
-    'send': '/opt/logix/logs/send.log',
-    'retry': '/opt/logix/logs/retry.log',
-    'backup': '/opt/logix/logs/backup.log',
-    'gpio': '/opt/logix/logs/gpio.log',
-    'has': '/opt/logix/logs/has-send.log'
+    'web': '/home/pi/logix/logs/web.log',
+    'sensor': '/home/pi/logix/logs/sensor.log',
+    'send': '/home/pi/logix/logs/send.log',
+    'retry': '/home/pi/logix/logs/retry.log',
+    'backup': '/home/pi/logix/logs/backup.log',
+    'gpio': '/home/pi/logix/logs/gpio.log',
+    'has': '/home/pi/logix/logs/has-send.log'
 }
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

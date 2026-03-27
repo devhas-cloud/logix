@@ -1,6 +1,6 @@
 from flask import Flask, send_from_directory, jsonify, request, send_file, session
 from functools import wraps
-import pandas as pd
+import polars as pl
 from datetime import datetime, timedelta
 import json
 import os
@@ -15,21 +15,8 @@ from dotenv import load_dotenv
 import hashlib
 import secrets
 
-# === Logging Setup ===
-log_path = "/opt/logix/log/web.log"
-os.makedirs(os.path.dirname(log_path), exist_ok=True)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(log_path),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-
 # === Load env ===
-env_path = "/opt/logix/config/env"
+env_path = "/home/pi/logix/config/.env"
 if not load_dotenv(dotenv_path=env_path):
     print(f"❌ env file not found at {env_path}")
     exit(1)
@@ -51,8 +38,12 @@ FRONTEND_DIR = os.path.join(BASE_DIR, "../frontend")
 
 # === Load Metadata ===
 try:
+    # Parse PARAMETERS from .env, filter empty strings
+    params_str = os.getenv("PARAMETERS", "")
+    params_list = [p.strip() for p in params_str.split(",") if p.strip()]
+    
     CONFIG = {
-        "parameters": os.getenv("PARAMETERS", "").split(","),
+        "parameters": params_list,
         "satuanph" : os.getenv("SATUAN_PH"),
         "satuanorp" : os.getenv("SATUAN_ORP"),
         "satuantds" : os.getenv("SATUAN_TDS"),
@@ -137,9 +128,8 @@ def query_to_dataframe(query, params=None):
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
-    df = pd.DataFrame(rows)
-    df.fillna(value=pd.NA, inplace=True)
-    df = df.astype(object).where(pd.notnull(df), None)
+    df = pl.DataFrame(rows)
+    # Polars handles nulls natively for JSON serialization
     return df
 
 
@@ -167,7 +157,7 @@ def get_usb_devices():
                                 os.makedirs(mount_point, exist_ok=True)
                                 try:
                                     subprocess.run(['mount', part_name, mount_point], check=True)
-                                    logging.info(f"✅ Mounted {part_name} at {mount_point}")
+                                    print(f"✅ Mounted {part_name} at {mount_point}")
                                     MOUNTED_USB.append(mount_point)
                                 except subprocess.CalledProcessError as e:
                                     print(f"❌ Mount failed for {part_name}: {e}")
@@ -184,7 +174,7 @@ def cleanup_usb_mounts():
     for mount_point in MOUNTED_USB:
         try:
             subprocess.run(['umount', mount_point], check=True)
-            logging.info(f"🛑 Unmounted {mount_point}")
+            print(f"🛑 Unmounted {mount_point}")
         except subprocess.CalledProcessError as e:
             print(f"⚠️ Failed to unmount {mount_point}: {e}")
     MOUNTED_USB = []
@@ -229,10 +219,10 @@ def latest_data():
                 """
         df = query_to_dataframe(query)
 
-        if df.empty:
+        if df.is_empty():
             return jsonify({param: None for param in params})
 
-        row = df.iloc[0].to_dict()
+        row = df.row(0, named=True)
         if 'date' in row and row['date']:
             row['date_str'] = row['date'].strftime("%Y-%m-%d %H:%M")
         return jsonify(row)
@@ -273,8 +263,8 @@ def history_data():
             return jsonify({"timestamps": [], "values": []})
 
         return jsonify({
-            "timestamps": df["date"].astype(str).tolist(),
-            "values": df[param].tolist()
+            "timestamps": df["date"].cast(pl.Utf8).to_list(),
+            "values": df[param].to_list()
         })
     except Exception as e:
         print(f"❌ /api/history error: {e}")
@@ -308,21 +298,17 @@ def windrose_data():
         """
         df = query_to_dataframe(query, (start_time,))
 
-        # Ganti NaN dengan None agar JSON valid
-        df.fillna(value=pd.NA, inplace=True)
-        df = df.astype(object).where(pd.notnull(df), None)
-
         if "wspeed" not in df.columns or "wdir" not in df.columns:
             return jsonify({"timestamps": [], "wspeed": [], "wdir": []})
 
         return jsonify({
-            "timestamps": df["date"].astype(str).tolist(),
-            "wspeed": df["wspeed"].tolist(),
-            "wdir": df["wdir"].tolist()
+            "timestamps": df["date"].cast(pl.Utf8).to_list(),
+            "wspeed": df["wspeed"].to_list(),
+            "wdir": df["wdir"].to_list()
         })
 
     except Exception as e:
-        logging.error("❌ /api/windrose error: %s", e)
+        print("❌ /api/windrose error: %s", e)
         traceback.print_exc()
         return jsonify({"timestamps": [], "wspeed": [], "wdir": [], "error": str(e)}), 500
 
@@ -355,30 +341,43 @@ def export_data():
         if not start or not end:
             return jsonify({"error": "Parameter 'start' dan 'end' wajib diisi."}), 400
 
-        logging.info(f"📦 Export request: {start} → {end} to {destination}")
+        print(f"📦 Export request: {start} → {end} to {destination}")
         start_dt = datetime.fromisoformat(start)
         end_dt = datetime.fromisoformat(end)
-
-        query = """
-            SELECT * FROM (
-                SELECT * FROM data
+        
+        # Export sesuai parameter yang dipilih dari CONFIG
+        # Pastikan 'device', 'date' selalu disertakan
+        parameters = CONFIG.get("parameters", [])
+        
+        # Filter empty strings jika ada
+        parameters = [p for p in parameters if p]
+        
+        selected_params = ["device", "date"] + parameters
+        param_fields = ', '.join(selected_params)
+        query = f"""
+            SELECT {param_fields} FROM (
+                SELECT {param_fields} FROM data
                 UNION ALL
-                SELECT * FROM tmp
+                SELECT {param_fields} FROM tmp
             ) AS combined
             WHERE date BETWEEN %s AND %s ORDER BY date ASC;
         """
         df = query_to_dataframe(query, (start_dt, end_dt))
-
-        if df.empty:
+       
+        
+        if df.is_empty():
             return jsonify({"error": "Tidak ada data dalam rentang waktu tersebut."}), 400
 
+        # Tambahkan nomor urut
+        df = df.with_row_count(name="no", offset=1)
         filename = sanitize_filename(f"export_{start}_{end}.csv")
+       
 
         if destination == "download":
-            csv_io = io.StringIO()
-            df.to_csv(csv_io, index=False)
+            # Polars write_csv returns string directly, not bytes
+            csv_string = df.write_csv()
             mem = io.BytesIO()
-            mem.write(csv_io.getvalue().encode('utf-8'))
+            mem.write(csv_string.encode('utf-8'))
             mem.seek(0)
             return send_file(
                 mem,
@@ -392,8 +391,8 @@ def export_data():
             if not mount_point or not os.access(mount_point, os.W_OK):
                 return jsonify({"error": f"USB '{destination}' tidak ditemukan atau tidak bisa ditulis."}), 500
             export_path = os.path.join(mount_point, filename)
-            df.to_csv(export_path, index=False)
-            logging.info(f"✅ Data exported to: {export_path}")
+            df.write_csv(export_path)
+            print(f"✅ Data exported to: {export_path}")
             return jsonify({"status": "success", "path": export_path})
     except Exception as e:
         print(f"❌ Export error: {e}")
@@ -441,7 +440,7 @@ def connect_wifi():
         data = request.get_json()
         ssid = data.get('ssid')
         password = data.get('password')
-        #logging.info(f"Simulating connect to SSID: {ssid}")
+        #print(f"Simulating connect to SSID: {ssid}")
         subprocess.run(['nmcli', 'dev', 'wifi', 'connect', ssid, 'password', password])
         return jsonify({'message': f'Terhubung ke {ssid} .'})
     except Exception as e:
@@ -485,13 +484,13 @@ def login():
         if username == DEFAULT_USERNAME and verify_password(password, DEFAULT_PASSWORD_HASH):
             session['username'] = username
             session.permanent = True
-            logging.info(f"✅ User '{username}' logged in successfully")
+            print(f"✅ User '{username}' logged in successfully")
             return jsonify({'success': True, 'message': 'Login successful'})
         else:
             logging.warning(f"⚠️ Failed login attempt for user '{username}'")
             return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
     except Exception as e:
-        logging.error(f"Login error: {e}")
+        print(f"Login error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -501,10 +500,10 @@ def logout():
     try:
         username = session.get('username', 'unknown')
         session.clear()
-        logging.info(f"✅ User '{username}' logged out")
+        print(f"✅ User '{username}' logged out")
         return jsonify({'success': True, 'message': 'Logout successful'})
     except Exception as e:
-        logging.error(f"Logout error: {e}")
+        print(f"Logout error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -522,7 +521,7 @@ def read_config():
     """Read env configuration file and return as JSON"""
     try:
         config = {}
-        env_path = "/opt/logix/config/env"
+        env_path = "/home/pi/logix/config/.env"
         
         if not os.path.exists(env_path):
             return jsonify({"error": "Configuration file not found"}), 404
@@ -546,7 +545,7 @@ def read_config():
         
         return jsonify(config)
     except Exception as e:
-        logging.error(f"Error reading config: {e}")
+        print(f"Error reading config: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -556,7 +555,7 @@ def write_config():
     """Write configuration to env file"""
     try:
         data = request.get_json()
-        env_path = "/opt/logix/config/env"
+        env_path = "/home/pi/logix/config/.env"
         
         if not os.path.exists(env_path):
             return jsonify({"success": False, "message": "Configuration file not found"}), 404
@@ -607,7 +606,7 @@ def write_config():
             f.writelines(new_lines)
         
         
-        logging.info(f"✅ Configuration updated: {', '.join(data.keys())}")
+        print(f"✅ Configuration updated: {', '.join(data.keys())}")
 
         
         return jsonify({
@@ -617,7 +616,7 @@ def write_config():
             "new_keys": [k for k in data.keys() if k not in updated_keys]
         })
     except Exception as e:
-        logging.error(f"Error writing config: {e}")
+        print(f"Error writing config: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
 
 

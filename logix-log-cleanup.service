@@ -4,7 +4,7 @@ Documentation=Membersihkan log files dan menyisakan 1000 baris terakhir
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /opt/logix/backend/log_cleanup.py
+ExecStart=/usr/bin/python3 /home/pi/logix/backend/log_cleanup.py
 User=root
 StandardOutput=journal
 StandardError=journal

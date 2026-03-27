@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # ======================================================
 # Load environment variables
 # ======================================================
-ENV_PATH = "/opt/logix/config/env"
+ENV_PATH = "/home/pi/logix/config/.env"
 
 if not load_dotenv(dotenv_path=ENV_PATH):
     raise FileNotFoundError(f"Env file tidak ditemukan: {ENV_PATH}")

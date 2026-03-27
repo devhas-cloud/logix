@@ -23,7 +23,7 @@ import sqlite3
 import pytz
 
 # Load environment variables
-env_path = "/opt/logix/config/env"
+env_path = "/home/pi/logix/config/.env"
 if not load_dotenv(dotenv_path=env_path):
     print(f"Error: env file not found at {env_path}")
     exit(1)
@@ -48,7 +48,7 @@ TSS200X_STATUS = os.getenv('TSS200X_STATUS', 'inactive')
 XYMD02_STATUS = os.getenv('XYMD02_STATUS', 'inactive')
 
 # SQLite Database GPIO
-DB_PATH = os.getenv("SQLITE_DB_PATH", "/opt/logix/data/gpio_logix.db")
+DB_PATH = os.getenv("SQLITE_DB_PATH", "/home/pi/logix/data/gpio_logix.db")
 
 def connect_db():
     """Membuka koneksi ke database SQLite."""

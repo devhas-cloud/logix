@@ -14,9 +14,9 @@ set -euo pipefail
 trap 'echo "❌ Error pada baris $LINENO. Perintah gagal: $BASH_COMMAND"' ERR
 
 # Konfigurasi
-readonly SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-backup.service" "logix-gpio.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service" "logix-log-cleanup.service")
-readonly LOG_DIR="/opt/logix/logs"
-readonly APP_BASE="/opt/logix"
+readonly SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service" "logix-log-cleanup.service")
+readonly LOG_DIR="/home/pi/logix/logs"
+readonly APP_BASE="/home/pi/logix"
 readonly BIN_PATH="/usr/bin/logix"
 readonly DB_DIR="$APP_BASE/database"
 
@@ -212,7 +212,7 @@ help_menu() {
     echo "========================================================================================================"
     echo "📌 Dibuat oleh        : Abu Bakar <abubakar.it.dev@gmail.com>"
     echo "📌 Deskripsi          : Sistem pemantauan cuaca dan kualitas udara otomatis berbasis Python & API"
-    echo "📌 Lokasi Instalasi   : /opt/logix"
+    echo "📌 Lokasi Instalasi   : /home/pi/logix"
     echo "📌 Service            : logix-sensor, logix-web, logix-web-log, logix-backup, logix-klhk-send, logix-klhk-retry, logix-has-send, logix-log-cleanup"
     echo "📌 Web Port           : 0.0.0.0:5010"
     echo "📌 Web Log Port       : 0.0.0.0:3000"

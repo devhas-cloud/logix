@@ -9,7 +9,7 @@ from logsSend import send_network_log,send_connection_log,send_sensor_log
 
 
 # Load environment variables
-env_path = "/opt/logix/config/env"  # env file path
+env_path = "/home/pi/logix/config/.env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
     print(f"Error: env file not found at {env_path}")
     exit(1)

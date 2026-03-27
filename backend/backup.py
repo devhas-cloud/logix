@@ -11,14 +11,14 @@ from dotenv import load_dotenv
 import pytz
 
 # === Load environment variables ===
-env_path = "/opt/logix/config/env"
+env_path = "/home/pi/logix/config/.env"
 if not load_dotenv(dotenv_path=env_path):
     print(f"[{ambilDate}] Error: env file not found at {env_path}")
     exit(1)
 
 # === Path Konfigurasi ===
-BACKUP_DIR = "/opt/logix/database/backup"
-STATE_FILE = "/opt/logix/database/backup_state.json"
+BACKUP_DIR = "/home/pi/logix/database/backup"
+STATE_FILE = "/home/pi/logix/database/backup_state.json"
 
 # === Konfigurasi MySQL ===
 HOST = os.getenv('DB_HOST')

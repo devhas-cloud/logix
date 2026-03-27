@@ -90,9 +90,9 @@ function setupUIFromConfig() {
 // Inisialisasi peta Leaflet
 function initializeMap() {
     const { latitude, longitude } = config.geo;
-    map = L.map('map').setView([latitude, longitude], 13);
+    map = L.map('map', { attributionControl: false }).setView([latitude, longitude], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        attribution: ''
     }).addTo(map);
     marker = L.marker([latitude, longitude]).addTo(map).bindPopup("Lokasi Sensor").openPopup();
 }
@@ -238,7 +238,7 @@ async function renderWindRose(range = "realtime") {
             showlegend: false
         };
 
-        Plotly.newPlot("windRoseChart", [trace], layout);
+        Plotly.newPlot("windRoseChart", [trace], layout, { displaylogo: false });
 
     } catch (e) {
         console.error("❌ Gagal render wind rose:", e);
@@ -310,7 +310,7 @@ async function renderHistoryChart() {
             paper_bgcolor: '#fff'
         };
 
-        Plotly.react("dataChart", [trace], layout, { responsive: true });
+        Plotly.react("dataChart", [trace], layout, { responsive: true, displaylogo: false });
 
     } catch (err) {
         console.error("Gagal render grafik:", err);

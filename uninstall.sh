@@ -17,7 +17,7 @@ echo ""
 
 set -e  # Hentikan jika terjadi error
 
-APP_BASE="/opt/logix"
+APP_BASE="/home/pi/logix"
 SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-gpio.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service")
 TIMERS=("logix-log-cleanup.timer")
 
@@ -57,13 +57,7 @@ echo "🔄 Reload systemd daemon..."
 systemctl daemon-reload
 systemctl reset-failed
 
-# === Hapus direktori instalasi ===
-if [[ -d "$APP_BASE" ]]; then
-    echo "🧹 Menghapus direktori instalasi di $APP_BASE..."
-    rm -rf "$APP_BASE"
-else
-    echo "⚠️  Direktori $APP_BASE tidak ditemukan, melewati."
-fi
+
 
 # === Hapus symlink CLI ===
 if [[ -f "/usr/bin/logix" ]]; then

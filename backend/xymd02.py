@@ -5,18 +5,18 @@ import os
 from dotenv import load_dotenv
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/opt/logix/config/env"  # env file path
+env_path = "/home/pi/logix/config/.env"  # env file path
 if not load_dotenv(dotenv_path=env_path):
     print(f"Error: env file not found at {env_path}")
     exit(1)
 
 XYMD02_PORT = "/dev/ttySC0"  # Default port, can be overridden by env variable
 XYMD02_STATUS = os.getenv('XYMD02_STATUS')
-XYMD02_SLAVE_ID = int(1)  # Default ke 1 jika tidak ada di env
+XYMD02_SLAVE_ID = int(os.getenv('XYMD02_SLAVE_ID', 1))  # Default ke 1 jika tidak ada di env
 
 PORT_NAME = XYMD02_PORT
 BAUDRATE = 9600
-SLAVE_ID = 1
+SLAVE_ID = XYMD02_SLAVE_ID
 TEMP_REG = 1
 HUM_REG = 2
 

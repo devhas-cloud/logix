@@ -7,13 +7,13 @@ import os
 from datetime import datetime
 
 LOG_FILES = {
-    'web': '/opt/logix/logs/web.log',
-    'sensor': '/opt/logix/logs/sensor.log',
-    'send': '/opt/logix/logs/send.log',
-    'retry': '/opt/logix/logs/retry.log',
-    'backup': '/opt/logix/logs/backup.log',
-    'gpio': '/opt/logix/logs/gpio.log',
-    'has': '/opt/logix/logs/has-send.log'
+    'web': '/home/pi/logix/logs/web.log',
+    'sensor': '/home/pi/logix/logs/sensor.log',
+    'send': '/home/pi/logix/logs/send.log',
+    'retry': '/home/pi/logix/logs/retry.log',
+    'backup': '/home/pi/logix/logs/backup.log',
+    'gpio': '/home/pi/logix/logs/gpio.log',
+    'has': '/home/pi/logix/logs/has-send.log'
 }
 
 def cleanup_log_file(filepath, max_lines=1000):
