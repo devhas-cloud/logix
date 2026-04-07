@@ -94,6 +94,8 @@ def should_run():
 
 
 def main():
+    global CONFIG_DB, DELAY, AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, RT200_STATUS, SEM5096_STATUS, ARG314_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, DS502_STATUS, AMMONIA200_STATUS, COD200X_STATUS, H1601_STATUS, PH200_STATUS, TSS200X_STATUS, XYMD02_STATUS
+    
     current_date = ambilDate()
     print(f"[{current_date}] ⏱️ Service dimulai. Menunggu waktu eksekusi sensor setiap {DELAY} menit.")
     last_run = None
@@ -120,6 +122,25 @@ def main():
                     try:
                         CONFIG_DB = loadConfig()
                         print("✅ Configuration reloaded from SQLite database")
+                        
+                        # Reload semua sensor status variables dari config terbaru
+                        DELAY = int(CONFIG_DB.get('delay', '2'))
+                        AT500_STATUS = CONFIG_DB.get('at500_status', 'inactive')
+                        MACE_STATUS = CONFIG_DB.get('mace_status', 'inactive')
+                        SPECTRO_STATUS = CONFIG_DB.get('spectro_status', 'inactive')
+                        RT200_STATUS = CONFIG_DB.get('rt200_status', 'inactive')
+                        SEM5096_STATUS = CONFIG_DB.get('sem5096_status', 'inactive')
+                        ARG314_STATUS = CONFIG_DB.get('arg314_status', 'inactive')
+                        ISCAN_STATUS = CONFIG_DB.get('iscan_status', 'inactive')
+                        LTNC_STATUS = CONFIG_DB.get('ltnc_status', 'inactive')
+                        CONTLYTE_STATUS = CONFIG_DB.get('contlyte_status', 'inactive')
+                        DS502_STATUS = CONFIG_DB.get('ds502_status', 'inactive')
+                        AMMONIA200_STATUS = CONFIG_DB.get('ammonia200_status', 'inactive')
+                        COD200X_STATUS = CONFIG_DB.get('cod200x_status', 'inactive')
+                        H1601_STATUS = CONFIG_DB.get('h1601_status', 'inactive')
+                        PH200_STATUS = CONFIG_DB.get('ph200_status', 'inactive')
+                        TSS200X_STATUS = CONFIG_DB.get('tss200x_status', 'inactive')
+                        XYMD02_STATUS = CONFIG_DB.get('xymd02_status', 'inactive')
                     except Exception as e:
                         print(f"❌ Failed to reload config from SQLite: {e}")
 
