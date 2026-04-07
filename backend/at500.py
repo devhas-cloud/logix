@@ -2,16 +2,13 @@ import serial
 import struct
 import time
 import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-AT500_STATUS = os.getenv('AT500_STATUS')
-AT500_PORT = os.getenv('AT500_PORT')
+AT500_STATUS = CONFIG_DB.get('at500_status', 'inactive')
+AT500_PORT = CONFIG_DB.get('at500_port', '/dev/ttyAMA3')
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
 MAX_RETRIES = 3
 
@@ -106,6 +103,13 @@ def read_salinity():
     )
 
 def get_at500_data():
+    global CONFIG_DB, AT500_STATUS, AT500_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    AT500_STATUS = CONFIG_DB.get('at500_status', 'inactive')
+    AT500_PORT = CONFIG_DB.get('at500_port', '/dev/ttyAMA3')
+    
     """
     Membaca data dari sensor AT500.
     Return tuple: (pH, ORP, TDS, Conductivity, DO, Salinity, NH3-N)

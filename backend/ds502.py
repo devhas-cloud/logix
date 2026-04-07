@@ -1,16 +1,13 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
-DS502_STATUS = os.getenv("DS502_STATUS", "inactive").lower()
-DS502_PORT = os.getenv("DS502_PORT")
+CONFIG_DB = loadConfig()
+
+DS502_STATUS = CONFIG_DB.get("ds502_status", "inactive").lower()
+DS502_PORT = CONFIG_DB.get("ds502_port")
 
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
 MAX_RETRIES = 3
@@ -116,6 +113,12 @@ def read_depth(DS502_PORT):
     return read_modbus(DS502_PORT, bytearray([0x01, 0x03, 0x01, 0x04, 0x00, 0x02]))
 
 def get_ds502_data():
+    global CONFIG_DB, DS502_STATUS, DS502_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    DS502_STATUS = CONFIG_DB.get('ds502_status', 'inactive')
+    DS502_PORT = CONFIG_DB.get('ds502_port', '/dev/ttyAMA5')
 
     """
     Membaca data dari sensor AT500.

@@ -1,18 +1,13 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-
-AMMONIA200_PORT = os.getenv('AMMONIA200_PORT')
-AMMONIA200_STATUS = os.getenv('AMMONIA200_STATUS')
+AMMONIA200_PORT = CONFIG_DB.get('ammonia200_port')
+AMMONIA200_STATUS = CONFIG_DB.get('ammonia200_status')
 MAX_RETRIES = 3
 SERIAL_CFG = dict(baudrate=9600, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=0.2)
 
@@ -48,6 +43,12 @@ def read_modbus(port, request, retries=MAX_RETRIES):
     return None
 
 def get_ammonia200_data():
+    global CONFIG_DB, AMMONIA200_STATUS, AMMONIA200_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    AMMONIA200_STATUS = CONFIG_DB.get('ammonia200_status')
+    AMMONIA200_PORT = CONFIG_DB.get('ammonia200_port')
 
     if AMMONIA200_STATUS.lower() != "active":
         print("[INFO] Modul Ammonia200 tidak aktif. Melewati pembacaan data.")

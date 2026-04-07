@@ -1,17 +1,14 @@
 import serial
 import struct
-import time
 import os
-from dotenv import load_dotenv
+import time
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-PH200_PORT = os.getenv('PH200_PORT')
-PH200_STATUS = os.getenv('PH200_STATUS')
+PH200_PORT = CONFIG_DB.get('ph200_port')
+PH200_STATUS = CONFIG_DB.get('ph200_status')
 
 MAX_RETRIES = 3
 SERIAL_CFG = dict(baudrate=9600, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=0.2)
@@ -55,6 +52,12 @@ def read_wtemp():
 
 
 def get_ph200_data():
+    global CONFIG_DB, PH200_STATUS, PH200_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    PH200_STATUS = CONFIG_DB.get('ph200_status', 'inactive')
+    PH200_PORT = CONFIG_DB.get('ph200_port', '/dev/ttyAMA5')
 
     if PH200_STATUS.lower() != "active":
         print("[INFO] Modul PH200 tidak aktif. Melewati pembacaan data.")

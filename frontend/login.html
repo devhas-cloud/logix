@@ -156,7 +156,7 @@
     <div class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <h1><i class="bi bi-gear-fill"></i> Configuration</h1>
+                <h1><i class="bi bi-gear-fill"></i>LOGIX</h1>
                 <p>Enter your credentials to access settings</p>
             </div>
             
@@ -271,7 +271,7 @@
                 if (response.ok) {
                     showAlert('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
-                        window.location.href = '/config.html';
+                        window.location.href = '/admin';
                     }, 1000);
                 } else {
                     showAlert(data.message || 'Login failed');
@@ -293,8 +293,8 @@
                 const data = await response.json();
                 
                 if (data.authenticated) {
-                    // Already logged in, redirect to config
-                    window.location.href = '/config.html';
+                    // Already logged in, redirect to admin
+                    window.location.href = '/admin';
                 }
             } catch (error) {
                 console.error('Auth check error:', error);

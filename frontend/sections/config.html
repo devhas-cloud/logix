@@ -1,0 +1,548 @@
+<!-- CONFIGURATION SECTION -->
+<h2 class="page-title">Konfigurasi Sistem</h2>
+    <p class="page-subtitle">Kelola pengaturan aplikasi, database, API, dan device</p>
+
+    <div id="config-alert-container" style="margin-bottom: 1rem;"></div>
+
+    <!-- Config Form -->
+    <div class="table-container" style="padding: 2rem;">
+        <form id="configForm">
+            
+            <!-- General Configuration -->
+            <div class="config-form-section">
+                <h5>
+                    <i class="bi bi-sliders"></i> Pengaturan Umum
+                </h5>
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">Timezone</label>
+                        <select class="form-control" id="config-timezone">
+                            <option value="Asia/Jakarta">Asia/Jakarta (UTC+7)</option>
+                            <option value="Asia/Makassar">Asia/Makassar (UTC+8)</option>
+                            <option value="Asia/Jayapura">Asia/Jayapura (UTC+9)</option>
+                        </select>
+                        <small>Pilih zona waktu sesuai lokasi perangkat</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Device ID</label>
+                        <input type="text" class="form-control" id="config-device-id" placeholder="DEVICE001">
+                        <small>ID unik perangkat untuk identifikasi</small>
+                    </div>
+                </div>
+                <!-- Hidden fields to keep form data intact -->
+                <!-- <input type="hidden" id="config-port-app">
+                <input type="hidden" id="config-port-log">
+                <input type="hidden" id="config-parameters">
+                <input type="hidden" id="config-gap-web">
+                <input type="hidden" id="config-web-title">
+                <input type="hidden" id="config-web-name">
+                <input type="hidden" id="config-location-name">
+                <input type="hidden" id="config-software-version">
+                <input type="hidden" id="config-geo-latitude">
+                <input type="hidden" id="config-geo-longitude"> -->
+            </div>
+
+            <!-- Database Configuration -->
+            <div class="config-form-section">
+                <h5>
+                    <i class="bi bi-database"></i> Konfigurasi Database
+                </h5>
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">Host</label>
+                        <input type="text" class="form-control" id="config-db-host" placeholder="localhost">
+                        <small>Alamat server database MySQL</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Port</label>
+                        <input type="number" class="form-control" id="config-db-port" placeholder="3306">
+                        <small>Port koneksi database (default: 3306)</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Database Name</label>
+                        <input type="text" class="form-control" id="config-db-name" placeholder="nama_database">
+                        <small>Nama database yang digunakan</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="config-db-user" placeholder="root">
+                        <small>Username untuk koneksi database</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="config-db-password">
+                        <small>Password untuk koneksi database</small>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Device Sensor -->
+            <div class="config-form-section">
+                <h5>
+                    <i class="bi bi-cpu"></i> Konfigurasi Sensor Device
+                </h5>
+
+                <!-- AT500 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">AT500 Status</label>
+                        <select class="form-control" id="config-at500-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor AT500</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">AT500 Port</label>
+                        <input type="text" class="form-control" id="config-at500-port" placeholder="/dev/ttyAMA3">
+                        <small>Serial port untuk AT500</small>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- RT200 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">RT200 Status</label>
+                        <select class="form-control" id="config-rt200-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor RT200</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">RT200 Port</label>
+                        <input type="text" class="form-control" id="config-rt200-port" placeholder="/dev/ttyAMA4">
+                        <small>Serial port untuk RT200</small>
+                    </div>
+                </div>  
+<hr>
+                <!-- SEM5096 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">SEM5096 Status</label>
+                        <select class="form-control" id="config-sem5096-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor SEM5096</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">SEM5096 Port</label>
+                        <input type="text" class="form-control" id="config-sem5096-port" placeholder="/dev/ttySC1">
+                        <small>Serial port untuk SEM5096</small>
+                    </div>
+                </div>
+                <hr>
+                <!-- MACE -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">MACE Status</label>
+                        <select class="form-control" id="config-mace-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor MACE</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">MACE Port</label>
+                        <input type="text" class="form-control" id="config-mace-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk MACE</small>
+                    </div>
+                </div>
+                <hr>
+                <!-- ISCAN -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">ISCAN Status</label>
+                        <select class="form-control" id="config-iscan-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor ISCAN</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">ISCAN Port</label>
+                        <input type="text" class="form-control" id="config-iscan-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk ISCAN</small>
+                    </div>
+                </div>
+<hr>
+                <!-- LTNC -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">LTNC Status</label>
+                        <select class="form-control" id="config-ltnc-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor LTNC</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">LTNC Port</label>
+                        <input type="text" class="form-control" id="config-ltnc-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk LTNC</small>
+                    </div>
+                </div>
+
+                
+
+<hr>
+                    <!-- CONTLYTE -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">CONTLYTE Status</label>
+                        <select class="form-control" id="config-contlyte-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor CONTLYTE</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">CONTLYTE Port</label>
+                        <input type="text" class="form-control" id="config-contlyte-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk CONTLYTE</small>
+                    </div>
+                </div>
+                <hr>
+                    <!-- DS502 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">DS502 Status</label>
+                        <select class="form-control" id="config-ds502-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor DS502</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">DS502 Port</label>
+                        <input type="text" class="form-control" id="config-ds502-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk DS502</small>
+                    </div>
+                </div>
+                <hr>
+
+                    <!-- AMMONIA200 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">AMMONIA200 Status</label>
+                        <select class="form-control" id="config-ammonia200-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor AMMONIA200</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">AMMONIA200 Port</label>
+                        <input type="text" class="form-control" id="config-ammonia200-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk AMMONIA200</small>
+                    </div>
+                </div>
+<hr>
+
+                    <!-- COD200X -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">COD200X Status</label>
+                        <select class="form-control" id="config-cod200x-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor COD200X</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">COD200X Port</label>
+                        <input type="text" class="form-control" id="config-cod200x-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk COD200X</small>
+                    </div>
+                </div>
+                <hr>
+                    <!-- H1601 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">H1601 Status</label>
+                        <select class="form-control" id="config-h1601-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor H1601</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">H1601 Port</label>
+                        <input type="text" class="form-control" id="config-h1601-port" placeholder="/dev/ttyAMA3">
+                        <small>Serial port untuk H1601</small>
+                    </div>
+                </div>
+                <hr>
+
+                    <!-- PH200 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">PH200 Status</label>
+                        <select class="form-control" id="config-ph200-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor PH200</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">PH200 Port</label>
+                        <input type="text" class="form-control" id="config-ph200-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk PH200</small>
+                    </div>
+                </div>
+<hr>
+
+                    <!-- TSS200X -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">TSS200X Status</label>
+                        <select class="form-control" id="config-tss200x-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor TSS200X</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">TSS200X Port</label>
+                        <input type="text" class="form-control" id="config-tss200x-port" placeholder="/dev/ttyAMA5">
+                        <small>Serial port untuk TSS200X</small>
+                    </div>
+                </div>
+<hr>
+                <!-- SPECTRO -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">SPECTRO Status</label>
+                        <select class="form-control" id="config-spectro-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor SPECTRO</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">SPECTRO IP</label>
+                        <input type="text" class="form-control" id="config-spectro-ip" placeholder="192.168.1.100">
+                        <small>IP address untuk SPECTRO</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">SPECTRO Port</label>
+                        <input type="number" class="form-control" id="config-spectro-port" placeholder="502">
+                        <small>Port untuk SPECTRO</small>
+                    </div>
+                </div>
+<hr>
+                    <!-- XYMD02 -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">XYMD02 Status</label>
+                        <select class="form-control" id="config-xymd02-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status sensor XYMD02</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">XYMD02 Port</label>
+                        <input type="text" class="form-control" id="config-xymd02-port" placeholder="/dev/ttySC0">
+                        <small>Serial port untuk XYMD02</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">XYMD02 Slave ID</label>
+                        <input type="number" class="form-control" id="config-xymd02-slave-id" placeholder="1">
+                        <small>Slave ID untuk XYMD02</small>
+                    </div>
+                </div>
+<hr>
+                    <!-- Delay -->
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">Delay Pembacaan (menit)</label>
+                        <input type="number" class="form-control" id="config-delay" placeholder="2" min="1" max="60">
+                        <small>Interval waktu pembacaan sensor (dalam menit)</small>
+                    </div>
+                </div>
+            </div>
+
+           
+            <!-- KLHK API Configuration -->
+            <div class="config-form-section">
+                <h5>
+                    <i class="bi bi-cloud-upload"></i> KLHK API
+                </h5>
+                <div class="config-form-grid">
+
+                    <div class="config-form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-control" id="config-klhk-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status pengiriman data ke KLHK API</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="form-label">API URL</label>
+                        <input type="text" class="form-control" id="config-klhk-api-url" placeholder="https://api.klhk.go.id/...">
+                        <small>URL endpoint API KLHK untuk pengiriman data</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Token URL</label>
+                        <input type="text" class="form-control" id="config-klhk-token-url" placeholder="https://api.klhk.go.id/token">
+                        <small>URL untuk mendapatkan token autentikasi</small>
+                    </div>
+
+                   
+                </div>
+                <br>
+                <div class="config-form-grid">
+                    
+                    
+                    <div class="config-form-group">
+                        <label class="form-label">UID</label>
+                        <input type="text" class="form-control" id="config-klhk-uid" placeholder="UID-XXXXX">
+                        <small>User ID yang terdaftar di sistem KLHK</small>
+                    </div>
+
+                     <div class="config-form-group">
+                        <label class="form-label">Fields (comma-separated)</label>
+                        <input type="text" class="form-control" id="config-klhk-fields" placeholder="datetime,pH,cod,tss,nh3n,flow">
+                        <small>Parameter yang dikirim, dipisahkan koma</small>
+                        <small style="display: block; margin-top: 0.5rem; color: #6366f1; font-weight: 500;">
+                            <i class="bi bi-info-circle"></i> Fields tersedia: datetime, pH, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3,atemp, wtemp, apress, wpress, hum, rain, wspeed, wdir, srad
+                        </small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="form-label">Max Retry Duplicate</label>
+                        <input type="number" class="form-control" id="config-klhk-max-dup-retry" placeholder="3">
+                        <small>Jumlah maksimal percobaan ulang untuk data duplikat</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Target Minute</label>
+                        <input type="number" class="form-control" id="config-klhk-target-minute" placeholder="0">
+                        <small>Menit target retry untuk pengiriman data (0-59)</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HAS API Configuration -->
+            <div class="config-form-section">
+                <h5>
+                    <i class="bi bi-cloud-upload"></i> HAS API
+                </h5>
+                <div class="config-form-grid">
+                    <div class="config-form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-control" id="config-has-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <small>Status pengiriman data ke HAS API</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">API URL</label>
+                        <input type="text" class="form-control" id="config-has-api-url" placeholder="https://has.example.com/api">
+                        <small>URL endpoint API HAS</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="form-label">HAS Logs API URL</label>
+                        <input type="text" class="form-control" id="config-has-logs-api-url" placeholder="https://has.example.com/logs">
+                        <small>URL API untuk log HAS</small>
+                    </div>
+
+                </div>
+                <div class="config-form-grid">
+
+                    <div class="config-form-group">
+                        <label class="form-label">Token</label>
+                        <input type="password" class="form-control" id="config-has-token-api">
+                        <small>Token autentikasi untuk HAS API</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="form-label">Fields (comma-separated)</label>
+                        <input type="text" class="form-control" id="config-has-fields" placeholder="datetime,pH,cod,tss">
+                        <small>Parameter yang dikirim ke HAS</small>
+                        <small style="display: block; margin-top: 0.5rem; color: #6366f1; font-weight: 500;">
+                            <i class="bi bi-info-circle"></i> Fields tersedia: datetime, pH, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp, wtemp, apress, wpress, hum, rain, wspeed, wdir, srad
+                        </small>
+                    </div>
+                    
+
+                </div>
+            </div>
+
+
+            <!-- Display Configuration -->
+
+                <div class="config-form-section">
+                    <h5>
+                        <i class="bi bi-display"></i> Konfigurasi Tampilan
+                    </h5>
+                    <div class="config-form-grid">
+                        <div class="config-form-group">
+                            <label class="form-label">Web Title</label>
+                            <input type="text" class="form-control" id="config-web-title" placeholder="WQMS">
+                            <small>Judul yang ditampilkan di tab browser</small>
+                        </div>
+                        <div class="config-form-group">
+                            <label class="form-label">Web Name</label>
+                            <input type="text" class="form-control" id="config-web-name" placeholder="Water Quality Monitoring System">
+                            <small>Nama aplikasi yang ditampilkan di header</small>
+                        </div>
+                    </div>
+                    <div class="config-form-grid">
+                         <div class="config-form-group">
+                            <label class="form-label">Parameters to Display (comma-separated)</label>
+                            <input type="text" class="form-control" id="config-parameters" placeholder="pH,cod,tss,nh3n,flow">
+                            <small>Parameter yang ditampilkan di dashboard, dipisahkan koma</small>
+                            <small style="display: block; margin-top: 0.5rem; color: #6366f1; font-weight: 500;">
+                                <i class="bi bi-info-circle"></i> Fields tersedia: pH, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp, wtemp, apress, wpress, hum, rain, wspeed, wdir, srad
+                            </small>
+                        </div>
+                            <div class="config-form-group">
+                            <label class="form-label">Location Name</label>
+                            <input type="text" class="form-control" id="config-location-name" placeholder="Lokasi Pengukuran">
+                            <small>Nama lokasi yang ditampilkan di dashboard</small>
+                        </div>
+                    </div>
+
+                    <div class="config-form-grid">
+                        <div class="config-form-group">
+                            <label class="form-label">Latitude</label>
+                            <input type="text" class="form-control" id="config-geo-latitude" placeholder="-6.200000">
+                            <small>Koordinat geografis - Latitude</small>
+                        </div>
+                        <div class="config-form-group">
+                            <label class="form-label">Longitude</label>
+                            <input type="text" class="form-control" id="config-geo-longitude" placeholder="106.816666">
+                            <small>Koordinat geografis - Longitude</small>
+                        </div> 
+                        
+                        <div class="config-form-group">
+                            <label class="form-label">Data Display Gap (menit)</label>
+                            <input type="number" class="form-control" id="config-gap-web" placeholder="5" min="1" max="60">
+                            <small>Interval waktu untuk pembaruan data di dashboard (dalam menit)</small>
+                        </div>
+                        
+                        <div class="config-form-group">
+                            <label class="form-label">Software Version</label>
+                            <input type="text" class="form-control" id="config-software-version" placeholder="1.0.0">
+                            <small>Versi perangkat lunak yang ditampilkan di dashboard</small>
+                        </div>
+                    </div>  
+
+                </div>
+
+        </form>
+
+        <!-- Config Actions -->
+        <div class="config-actions">
+            <button class="filter-btn" onclick="saveConfiguration()">
+                <i class="bi bi-check-circle"></i> Simpan Konfigurasi
+            </button>
+        </div>
+    </div>

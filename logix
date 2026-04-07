@@ -14,7 +14,7 @@ set -euo pipefail
 trap 'echo "❌ Error pada baris $LINENO. Perintah gagal: $BASH_COMMAND"' ERR
 
 # Konfigurasi
-readonly SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service" "logix-log-cleanup.service")
+readonly SERVICES=("logix-sensor.service" "logix-web.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service")
 readonly LOG_DIR="/home/pi/logix/logs"
 readonly APP_BASE="/home/pi/logix"
 readonly BIN_PATH="/usr/bin/logix"
@@ -213,7 +213,7 @@ help_menu() {
     echo "📌 Dibuat oleh        : Abu Bakar <abubakar.it.dev@gmail.com>"
     echo "📌 Deskripsi          : Sistem pemantauan cuaca dan kualitas udara otomatis berbasis Python & API"
     echo "📌 Lokasi Instalasi   : /home/pi/logix"
-    echo "📌 Service            : logix-sensor, logix-web, logix-web-log, logix-backup, logix-klhk-send, logix-klhk-retry, logix-has-send, logix-log-cleanup"
+    echo "📌 Service            : logix-sensor, logix-web, logix-backup, logix-klhk-send, logix-klhk-retry, logix-has-send"
     echo "📌 Web Port           : 0.0.0.0:5010"
     echo "📌 Web Log Port       : 0.0.0.0:3000"
     echo "📌 PhpMyAdmin         : 0.0.0.0:8080"
@@ -224,12 +224,10 @@ help_menu() {
     echo "Service yang tersedia:"
     echo "  sensor              → Pembaca sensor"
     echo "  web                 → Web Dashboard"
-    echo "  web-log             → Web Dashboard Log"
     echo "  backup              → Backup Data"
     echo "  klhk-send           → API kirim data KLHK"
     echo "  klhk-retry          → Retry API kirim data KLHK"
     echo "  logix-has-send      → API kirim data HAS Server"
-    echo "  log-cleanup         → Pembersihan log otomatis"
     echo ""
     echo "Perintah yang tersedia:"
     echo "  uninstall           → Hapus logix (membutuhkan konfirmasi)"

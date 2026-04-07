@@ -7,30 +7,27 @@ import requests
 import mysql.connector
 from datetime import datetime
 from collections import defaultdict
-from dotenv import load_dotenv
+from config import loadConfig
 
-# Load environment variables
-env_path = "/home/pi/logix/config/.env"
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+# Load configuration from SQLite
+CONFIG_DB = loadConfig()
 
-# Config from env
-STATUS = os.getenv("HAS_STATUS")
-HOST = os.getenv('DB_HOST')
-USER = os.getenv('DB_USER')
-PASSWORD = os.getenv('DB_PASSWORD')
-DATABASE = os.getenv('DB_NAME')
-PORT = int(os.getenv('DB_PORT'))
-TIMEZONE = os.getenv('TIMEZONE', 'Asia/Jakarta')
-API_ENDPOINT = os.getenv('HAS_API_URL')
-TOKEN_API = os.getenv('HAS_TOKEN_API')
-FIELDS = os.getenv('HAS_FIELDS').split(',') if os.getenv('HAS_FIELDS') else []
-DEVICE_ID = os.getenv('DEVICE_ID')
+# Config from SQLite
+STATUS = CONFIG_DB.get("has_status", "inactive")
+HOST = CONFIG_DB.get('db_host', '127.0.0.1')
+USER = CONFIG_DB.get('db_user', 'logix')
+PASSWORD = CONFIG_DB.get('db_password', 'logix')
+DATABASE = CONFIG_DB.get('db_name', 'logix')
+PORT = int(CONFIG_DB.get('db_port', '3306'))
+TIMEZONE = CONFIG_DB.get('timezone', 'Asia/Jakarta')
+API_ENDPOINT = CONFIG_DB.get('has_api_url')
+TOKEN_API = CONFIG_DB.get('has_token_api')
+FIELDS = CONFIG_DB.get('has_fields', '').split(',') if CONFIG_DB.get('has_fields') else []
+DEVICE_ID = CONFIG_DB.get('device_id')
 
 # Validasi TOKEN_API
 if not TOKEN_API:
-    print("Error: HAS_TOKEN_API tidak diset di file env")
+    print("Warning: has_token_api tidak diset di database configuration")
     exit(1)
 
 # Validasi FIELDS

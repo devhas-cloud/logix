@@ -3,15 +3,13 @@ import struct
 import time
 
 import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
 
-ISCAN_STATUS = os.getenv('ISCAN_STATUS')
-ISCAN_PORT = os.getenv('ISCAN_PORT')
+CONFIG_DB = loadConfig()
+
+ISCAN_STATUS = CONFIG_DB.get('iscan_status', 'inactive')
+ISCAN_PORT = CONFIG_DB.get('iscan_port', '/dev/ttyAMA5')
 
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
 MAX_RETRIES = 3
@@ -79,8 +77,14 @@ def read_temp():
     )
 
 
-
 def get_iscan_data():
+    global CONFIG_DB, ISCAN_STATUS, ISCAN_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    ISCAN_STATUS = CONFIG_DB.get('iscan_status', 'inactive')
+    ISCAN_PORT = CONFIG_DB.get('iscan_port', '/dev/ttyAMA5')
+    
     """
     Membaca data dari sensor ISCAN.
     Jika sensor tidak aktif atau port tidak tersedia, return tuple berisi None.

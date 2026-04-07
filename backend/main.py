@@ -7,9 +7,8 @@ from rt200 import get_rt200_data
 from sem5096 import get_sem5096_data
 from iscan import get_iscan_data 
 from ltnc import get_ltnc_data 
-from config import insert_data, ambilDate, ambilDateTime
+from config import insert_data, ambilDate, ambilDateTime, loadConfig
 from datetime import datetime
-from dotenv import load_dotenv
 from contlyte import get_conlyte_data
 from ds502 import get_ds502_data
 from ammonia200 import get_ammonia200_data
@@ -22,94 +21,69 @@ from logsSend import send_network_log, send_connection_log, send_sensor_log
 import sqlite3
 import pytz
 
-# Load environment variables
-env_path = "/home/pi/logix/config/.env"
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
+# === Load Configuration from SQLite ===
+try:
+    CONFIG_DB = loadConfig()
+    print("✅ Configuration loaded from SQLite database")
+except Exception as e:
+    print(f"❌ Failed to load config from SQLite: {e}")
     exit(1)
 
-# Configuration from environment variables
-DELAY = int(os.getenv('DELAY'))
-AT500_STATUS = os.getenv('AT500_STATUS', 'inactive')
-MACE_STATUS = os.getenv('MACE_STATUS', 'inactive')
-SPECTRO_STATUS = os.getenv('SPECTRO_STATUS', 'inactive')
-RT200_STATUS = os.getenv('RT200_STATUS', 'inactive')
-SEM5096_STATUS = os.getenv('SEM5096_STATUS', 'inactive')
-ARG314_STATUS = os.getenv('ARG314_STATUS', 'inactive')
-ISCAN_STATUS = os.getenv('ISCAN_STATUS', 'inactive')
-LTNC_STATUS = os.getenv('LTNC_STATUS', 'inactive')
-CONTLYTE_STATUS = os.getenv('CONTLYTE_STATUS', 'inactive')
-DS502_STATUS = os.getenv('DS502_STATUS', 'inactive')
-AMMONIA200_STATUS = os.getenv('AMMONIA200_STATUS', 'inactive')
-COD200X_STATUS = os.getenv('COD200X_STATUS', 'inactive')
-H1601_STATUS = os.getenv('H1601_STATUS', 'inactive')
-PH200_STATUS = os.getenv('PH200_STATUS', 'inactive')
-TSS200X_STATUS = os.getenv('TSS200X_STATUS', 'inactive')
-XYMD02_STATUS = os.getenv('XYMD02_STATUS', 'inactive')
-
-# SQLite Database GPIO
-DB_PATH = os.getenv("SQLITE_DB_PATH", "/home/pi/logix/data/gpio_logix.db")
-
-def connect_db():
-    """Membuka koneksi ke database SQLite."""
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    return sqlite3.connect(DB_PATH)
+# === Configuration from SQLite ===
+DELAY = int(CONFIG_DB.get('delay', '2'))
+AT500_STATUS = CONFIG_DB.get('at500_status', 'inactive')
+MACE_STATUS = CONFIG_DB.get('mace_status', 'inactive')
+SPECTRO_STATUS = CONFIG_DB.get('spectro_status', 'inactive')
+RT200_STATUS = CONFIG_DB.get('rt200_status', 'inactive')
+SEM5096_STATUS = CONFIG_DB.get('sem5096_status', 'inactive')
+ARG314_STATUS = CONFIG_DB.get('arg314_status', 'inactive')
+ISCAN_STATUS = CONFIG_DB.get('iscan_status', 'inactive')
+LTNC_STATUS = CONFIG_DB.get('ltnc_status', 'inactive')
+CONTLYTE_STATUS = CONFIG_DB.get('contlyte_status', 'inactive')
+DS502_STATUS = CONFIG_DB.get('ds502_status', 'inactive')
+AMMONIA200_STATUS = CONFIG_DB.get('ammonia200_status', 'inactive')
+COD200X_STATUS = CONFIG_DB.get('cod200x_status', 'inactive')
+H1601_STATUS = CONFIG_DB.get('h1601_status', 'inactive')
+PH200_STATUS = CONFIG_DB.get('ph200_status', 'inactive')
+TSS200X_STATUS = CONFIG_DB.get('tss200x_status', 'inactive')
+XYMD02_STATUS = CONFIG_DB.get('xymd02_status', 'inactive')
 
 
-def get_sensor_gpio(current_date, sensor, auto_delete=True):
-    """
-    Mengambil data terbaru dari tabel gpio berdasarkan nama sensor dan datetime tertentu.
-    
-    Argumen:
-        sensor (str): nama sensor, misalnya 'rain_sensor'
-        current_date (str): waktu dalam format 'YYYY-MM-DD HH:MM:SS'
-        auto_delete (bool): jika True, hapus data lama di tanggal yang sama setelah dibaca.
-        
-    Return:
-        float | None: nilai sensor terbaru pada tanggal yang sama, atau None jika tidak ada data.
-    """
+
+
+def cleanup_log_file(filepath, max_lines=6000):
+    """Membersihkan file log dan menyisakan max_lines baris terakhir"""
+    if not os.path.exists(filepath):
+        print(f"⚠️  File tidak ditemukan: {filepath}")
+        return False
     
     try:
-        conn = connect_db()
-        cursor = conn.cursor()
-
-        # Ambil data terbaru di tanggal yang sama dengan current_date
-        cursor.execute("""
-            SELECT id, `date`, nilai 
-            FROM gpio
-            WHERE sensor = ?
-              AND `date` = ?
-            ORDER BY `date` DESC
-            LIMIT 1;
-        """, (sensor, current_date))
-        result = cursor.fetchone()
- 
-        if result:
-            latest_id, latest_date, nilai = result
-
-            if auto_delete:
-                # Hapus semua data ketika data sudah diambil
-                cursor.execute("""
-                    DELETE FROM gpio
-                    WHERE sensor = ?
-                      AND `date` <= ?
-                """, (sensor, current_date))
-                conn.commit()
-                print(f"[GPIO] 🔄 Hapus data lama sensor '{sensor}' ")
-
-            print(f"[GPIO] ✅ Data terbaru sensor '{sensor}' untuk {latest_date}: {nilai}")
-            return nilai
-        else:
-            print(f"[GPIO] ⚠️ Tidak ada data sensor '{sensor}' untuk tanggal {current_date}")
-            return None
-
+        # Baca semua baris
+        with open(filepath, 'r') as f:
+            lines = f.readlines()
+        
+        original_lines = len(lines)
+        
+        # Jika file sudah kecil, skip
+        if original_lines <= max_lines:
+            print(f"✓ {filepath}: {original_lines} baris (tidak perlu dibersihkan)")
+            return True
+        
+        # Ambil hanya max_lines baris terakhir
+        last_lines = lines[-max_lines:]
+        
+        # Tulis ulang file dengan baris yang tersisa
+        with open(filepath, 'w') as f:
+            f.writelines(last_lines)
+        
+        deleted_lines = original_lines - max_lines
+        print(f"✓ {filepath}: {original_lines} → {max_lines} baris ({deleted_lines} baris dihapus)")
+        return True
+        
     except Exception as e:
-        print(f"[ERROR] Gagal mengambil data dari database: {e}")
-        return None
+        print(f"❌ Error membersihkan {filepath}: {e}")
+        return False
 
-    finally:
-        if 'cursor' in locals(): cursor.close()
-        if 'conn' in locals(): conn.close()
 
 
 
@@ -132,6 +106,7 @@ def main():
     
     try:
         while True:
+
             ph, orp, tds, conduct, do, salinity, nh3n = (None,) * 7
             battery, depth, flow, tflow = (None,) * 4
             turb, tss, cod, bod, no3, atemp, wtemp = (None,) * 7
@@ -140,6 +115,14 @@ def main():
             if should_run():
                 # Ensure we don't run twice at the same time
                 if last_run != now.replace(second=0, microsecond=0):
+
+                    # load ulang configuration setiap kali akan membaca sensor, untuk memastikan perubahan konfigurasi langsung diterapkan tanpa perlu restart service
+                    try:
+                        CONFIG_DB = loadConfig()
+                        print("✅ Configuration reloaded from SQLite database")
+                    except Exception as e:
+                        print(f"❌ Failed to reload config from SQLite: {e}")
+
                     current_date = ambilDate()
                     current_datetime = ambilDateTime()
                     print(f"\n[{current_date}] 📡 Membaca semua sensor...")
@@ -389,7 +372,14 @@ def main():
                     else:
                         print(f"[{current_date}] ❌ Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
                         
+                    print("\n")
+                    # bersihakan logs file
+                    log_files = ['web', 'sensor', 'send', 'retry', 'has-send', 'backup']
+                    for log_type in log_files:
+                        log_path = os.path.join('../logs', f'{log_type}.log')
+                        cleanup_log_file(log_path, max_lines=6000)
                     
+
                     last_run = now.replace(second=0, microsecond=0)
             
             time.sleep(0.5)

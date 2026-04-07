@@ -1,17 +1,13 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-TSS200X_STATUS = os.getenv('TSS200X_STATUS')
-TSS200X_PORT = os.getenv('TSS200X_PORT')
+TSS200X_STATUS = CONFIG_DB.get('tss200x_status')
+TSS200X_PORT = CONFIG_DB.get('tss200x_port')
 
 MAX_RETRIES = 3
 SERIAL_CFG = dict(baudrate=9600, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=0.2)
@@ -47,8 +43,14 @@ def read_modbus(port, request, retries=MAX_RETRIES):
     send_sensor_log(f"Gagal membaca data Sensor TSS200X dari {port} setelah {retries} percobaan.")
     return None
 
-def get_tss200x_data():
-
+def get_tss200x_data():    
+    global CONFIG_DB, TSS200X_STATUS, TSS200X_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    TSS200X_STATUS = CONFIG_DB.get('tss200x_status')
+    TSS200X_PORT = CONFIG_DB.get('tss200x_port')
+    
     if TSS200X_STATUS.lower() != "active":
         print("[INFO] Modul TSS200X tidak aktif. Melewati pembacaan data.")
         return None

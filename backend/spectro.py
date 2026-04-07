@@ -1,18 +1,14 @@
 import socket
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
-# Load environment variables
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
 
-STATUS = os.getenv('SPECTRO_STATUS')
-IP = os.getenv('SPECTRO_IP')
-PORT = os.getenv('SPECTRO_PORT')
+CONFIG_DB = loadConfig()
+
+STATUS = CONFIG_DB.get('spectro_status')
+IP = CONFIG_DB.get('spectro_ip')
+PORT = CONFIG_DB.get('spectro_port')
 
 def send_modbus_request(sock, transaction_id, unit_id, start_address, register_count):
     # Build request

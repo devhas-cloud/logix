@@ -1,17 +1,13 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-CONTLYTE_PORT = os.getenv('CONTLYTE_PORT')
-CONTLYTE_STATUS = os.getenv('CONTLYTE_STATUS')
+CONTLYTE_PORT = CONFIG_DB.get('contlyte_port')
+CONTLYTE_STATUS = CONFIG_DB.get('contlyte_status')
 
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
 MAX_RETRIES = 3
@@ -86,7 +82,13 @@ def read_temp():
     )
 
 def get_conlyte_data():
-
+    global CONFIG_DB, CONTLYTE_STATUS, CONTLYTE_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    CONTLYTE_STATUS = CONFIG_DB.get('contlyte_status')
+    CONTLYTE_PORT = CONFIG_DB.get('contlyte_port')
+    
     if CONTLYTE_STATUS != "active":
         print("[INFO] Modul CONTLYTE tidak aktif. Melewati pembacaan data.")
         send_sensor_log("Konfigurasi Modul CONTLYTE tidak aktif.")

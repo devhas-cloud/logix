@@ -2,25 +2,22 @@ import os
 import requests
 import pytz
 from datetime import datetime
-from dotenv import load_dotenv
+from config import loadConfig
 
 # ======================================================
-# Load environment variables
+# Load configuration from SQLite
 # ======================================================
-ENV_PATH = "/home/pi/logix/config/.env"
-
-if not load_dotenv(dotenv_path=ENV_PATH):
-    raise FileNotFoundError(f"Env file tidak ditemukan: {ENV_PATH}")
+CONFIG_DB = loadConfig()
 
 # ======================================================
 # Configuration
 # ======================================================
-API_ENDPOINT = os.getenv("HAS_LOGS_API_URL")
-API_TOKEN = os.getenv("HAS_LOGS_TOKEN_API")
-DEVICE_ID = os.getenv("DEVICE_ID")
-TIMEZONE = os.getenv("TIMEZONE", "Asia/Jakarta")
+API_ENDPOINT = CONFIG_DB.get("has_logs_api_url")
+API_TOKEN = CONFIG_DB.get("has_logs_token_api", "")
+DEVICE_ID = CONFIG_DB.get("device_id")
+TIMEZONE = CONFIG_DB.get("timezone", "Asia/Jakarta")
 
-if not all([API_ENDPOINT, API_TOKEN, DEVICE_ID]):
+if not API_ENDPOINT or not DEVICE_ID:
     raise EnvironmentError("Konfigurasi env belum lengkap")
 
 TZ = pytz.timezone(TIMEZONE)

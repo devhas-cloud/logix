@@ -2,15 +2,12 @@ import serial
 import struct
 import time
 import os
-from dotenv import load_dotenv
+from config import loadConfig
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-MACE_STATUS = os.getenv('MACE_STATUS')
-MACE_PORT = os.getenv('MACE_PORT')
+MACE_STATUS = CONFIG_DB.get('mace_status', 'inactive')
+MACE_PORT = CONFIG_DB.get('mace_port', '/dev/ttyAMA5')
 
 def read_mace():
     try:
@@ -56,7 +53,13 @@ def read_mace():
         return None, None, None, None
 
 def get_mace_data():
+    global CONFIG_DB, MACE_STATUS, MACE_PORT
     
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    MACE_STATUS = CONFIG_DB.get('mace_status', 'inactive')
+    MACE_PORT = CONFIG_DB.get('mace_port', '/dev/ttyAMA5')
+
     if MACE_STATUS.lower() != "active":
         print("[INFO] Modul MACE tidak aktif. Melewati pembacaan data.")
         send_sensor_log("Konfigurasi Modul MACE tidak aktif.")

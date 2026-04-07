@@ -18,7 +18,7 @@ echo ""
 set -e  # Hentikan jika terjadi error
 
 APP_BASE="/home/pi/logix"
-SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-gpio.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service")
+SERVICES=("logix-sensor.service" "logix-web.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service")
 TIMERS=("logix-log-cleanup.timer")
 
 # === Hentikan dan nonaktifkan semua timer ===

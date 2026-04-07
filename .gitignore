@@ -3,4 +3,5 @@ log/
 logs/
 database/backup/
 backend/__pycache__/
-config/.env
+config/config.db
+klhk/__pycache__/

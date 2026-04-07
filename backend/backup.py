@@ -7,28 +7,25 @@ import json
 from datetime import datetime, timedelta
 import mysql.connector
 from mysql.connector import Error
-from dotenv import load_dotenv
+from config import loadConfig
 import pytz
 
-# === Load environment variables ===
-env_path = "/home/pi/logix/config/.env"
-if not load_dotenv(dotenv_path=env_path):
-    print(f"[{ambilDate}] Error: env file not found at {env_path}")
-    exit(1)
+# === Load configuration from SQLite ===
+CONFIG_DB = loadConfig()
 
 # === Path Konfigurasi ===
 BACKUP_DIR = "/home/pi/logix/database/backup"
 STATE_FILE = "/home/pi/logix/database/backup_state.json"
 
 # === Konfigurasi MySQL ===
-HOST = os.getenv('DB_HOST')
-USER = os.getenv('DB_USER')
-PASSWORD = os.getenv('DB_PASSWORD')
-DATABASE = os.getenv('DB_NAME')
-PORT = os.getenv('DB_PORT')
+HOST = CONFIG_DB.get('db_host', '127.0.0.1')
+USER = CONFIG_DB.get('db_user', 'logix')
+PASSWORD = CONFIG_DB.get('db_password', 'logix')
+DATABASE = CONFIG_DB.get('db_name', 'logix')
+PORT = CONFIG_DB.get('db_port', '3306')
 
 # Timezone dan koneksi
-TIMEZONE = os.getenv('TIMEZONE')
+TIMEZONE = CONFIG_DB.get('timezone', 'Asia/Jakarta')
 tz = pytz.timezone(TIMEZONE)
 ambilDate = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
 

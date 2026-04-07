@@ -1,18 +1,14 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
 XYMD02_PORT = "/dev/ttySC0"  # Default port, can be overridden by env variable
-XYMD02_STATUS = os.getenv('XYMD02_STATUS')
-XYMD02_SLAVE_ID = int(os.getenv('XYMD02_SLAVE_ID', 1))  # Default ke 1 jika tidak ada di env
+XYMD02_STATUS = CONFIG_DB.get('xymd02_status')
+XYMD02_SLAVE_ID = int(CONFIG_DB.get('xymd02_slave_id', 1))  # Default ke 1 jika tidak ada di env
 
 PORT_NAME = XYMD02_PORT
 BAUDRATE = 9600
@@ -46,6 +42,13 @@ def read_register(port, slave_id, reg_addr):
 
 
 def get_xymd02_data():
+    global CONFIG_DB, XYMD02_STATUS, XYMD02_PORT, XYMD02_SLAVE_ID
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    XYMD02_STATUS = CONFIG_DB.get('xymd02_status', 'inactive')
+    XYMD02_PORT = CONFIG_DB.get('xymd02_port', '/dev/ttySC0')
+    XYMD02_SLAVE_ID = CONFIG_DB.get('xymd02_slave_id', '1')
 
     if XYMD02_STATUS.lower() != "active":
         print("[INFO] Modul XYMD02 tidak aktif. Melewati pembacaan data.")

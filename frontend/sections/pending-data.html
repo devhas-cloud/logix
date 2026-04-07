@@ -1,0 +1,82 @@
+<!-- PENDING DATA SECTION -->
+<div id="pending-section">
+    <h2 class="page-title">Data Siap Dikirim</h2>
+    <p class="page-subtitle">Data yang belum dikirim ke API eksternal</p>
+
+    <!-- Status Pengiriman Otomatis -->
+    <!-- Class 'status-card' menangani layout, padding, dan border -->
+    <div class="status-card">
+        <!-- Class 'status-content' menangani layout icon dan teks -->
+        <div class="status-content">
+            <!-- Icon color tetap inline karena spesifik -->
+            <i class="bi bi-clock-history" style="font-size: 1.5rem; color: #4f46e5; flex-shrink: 0;"></i>
+            <div>
+                <!-- Style teks status tetap inline karena akan diubah via JS -->
+                <div style="font-weight: 600; color: #1f2937;" id="send-status-text">
+                    <i class="bi bi-hourglass-split"></i> Memuat status...
+                </div>
+                <div style="font-size: 0.875rem; color: #6b7280;" id="send-schedule-text">
+                    Memeriksa jadwal pengiriman...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <!-- Class filter-group menggunakan CSS Grid -->
+    <div class="filter-group">
+        <div>
+            <!-- Label sekarang bersih, style diambil dari CSS .filter-group label -->
+            <label>Tanggal Mulai</label>
+            <input type="text" id="filter-pending-from" class="datepicker-datetime" placeholder="dd-mm-yyyy HH:mm" readonly />
+        </div>
+        <div>
+            <label>Tanggal Akhir</label>
+            <input type="text" id="filter-pending-to" class="datepicker-datetime" placeholder="dd-mm-yyyy HH:mm" readonly />
+        </div>
+        <!-- Class filter-actions menggunakan Flexbox -->
+        <div class="filter-actions">
+            <button class="filter-btn" onclick="filterPendingData()">
+                <i class="bi bi-search"></i> Filter
+            </button>
+            <button class="btn btn-primary" onclick="reloadPendingData()" title="Muat ulang data">
+                <i class="bi bi-arrow-clockwise"></i> Reload
+            </button>
+            <button class="btn btn-success" onclick="manualSendData()" id="manual-send-btn" title="Kirim data sekarang">
+                <i class="bi bi-send-fill"></i> Kirim Manual
+            </button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="section">
+        <div class="table-container">
+            <!-- Class table-responsive memungkinkan scroll horizontal otomatis -->
+            <div class="table-responsive">
+                <table class="table" id="pending-data-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>pH</th>
+                            <th>ORP</th>
+                            <th>TDS</th>
+                            <th>DO</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-data-body">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>Memuat data pending...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

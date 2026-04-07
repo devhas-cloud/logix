@@ -1,17 +1,13 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
+CONFIG_DB = loadConfig()
 
-H1601_PORT = os.getenv('H1601_PORT')
-H1601_STATUS = os.getenv('H1601_STATUS')
+H1601_PORT = CONFIG_DB.get('h1601_port')
+H1601_STATUS = CONFIG_DB.get('h1601_status')
 
 MAX_RETRIES = 5
 SERIAL_CFG = dict(baudrate=9600, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=0.2)
@@ -72,6 +68,12 @@ def read_flow():
 
 
 def get_h1601_data():
+    global CONFIG_DB, H1601_STATUS, H1601_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    H1601_STATUS = CONFIG_DB.get('h1601_status', 'inactive')
+    H1601_PORT = CONFIG_DB.get('h1601_port', '/dev/ttyAMA3')
 
     if H1601_STATUS.lower() != "active":
         print("[INFO] Modul H1601 tidak aktif. Melewati pembacaan data.")

@@ -1,16 +1,13 @@
 import serial
 import struct
 import time
-import os
-from dotenv import load_dotenv
+from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
-env_path = "/home/pi/logix/config/.env"  # env file path
-if not load_dotenv(dotenv_path=env_path):
-    print(f"Error: env file not found at {env_path}")
-    exit(1)
 
-LTNC_STATUS = os.getenv('LTNC_STATUS')
-LTNC_PORT = os.getenv('LTNC_PORT')
+CONFIG_DB = loadConfig()
+
+LTNC_STATUS = CONFIG_DB.get('ltnc_status')
+LTNC_PORT = CONFIG_DB.get('ltnc_port')
 # Jumlah maksimum percobaan jika tidak ada respon dari sensor
 MAX_RETRIES = 3
 
@@ -66,6 +63,13 @@ def read_depth():
 
 
 def get_ltnc_data():
+    global CONFIG_DB, LTNC_STATUS, LTNC_PORT
+    
+    # Reload config untuk memastikan perubahan konfigurasi langsung diterapkan
+    CONFIG_DB = loadConfig()
+    LTNC_STATUS = CONFIG_DB.get('ltnc_status')
+    LTNC_PORT = CONFIG_DB.get('ltnc_port')
+    
     """
     Membaca data dari sensor LTNC.
     Jika sensor tidak aktif atau port tidak tersedia, return tuple berisi None.

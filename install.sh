@@ -34,11 +34,9 @@ error_exit() {
 }
 
 # === Konfigurasi ===
-CONFIG_FILE="config/.env"
-[[ -f "$CONFIG_FILE" ]] || error_exit "File konfigurasi '$CONFIG_FILE' tidak ditemukan!"
-source "$CONFIG_FILE"
-WEB_PORT="${PORT_NUMBER_APP}"
-LOG_PORT="${PORT_NUMBER_LOG}"
+
+WEB_PORT="5010"
+APP_BASE=$(pwd)
 
 # === Header ===
 echo "============================================"
@@ -46,18 +44,16 @@ echo " Smart Portable Analyzer System (logix) - Installer"
 echo "============================================"
 echo "Dibuat oleh        : Abu Bakar <abubakar.it.dev@gmail.com>"
 echo "Deskripsi          : Sistem pemantauan cuaca dan kualitas udara otomatis berbasis Python & API"
-echo "Lokasi Instalasi   : /home/pi/logix"
-echo "Service            : logix-sensor, logix-web, logix-backup, logix-gpio, logix-klhk-send, logix-klhk-retry, logix-has-send"
+echo "Lokasi Instalasi   : $APP_BASE"
+echo "Service            : logix-sensor, logix-web, logix-backup, logix-klhk-send, logix-klhk-retry, logix-has-send"
 echo "Web Port           : 0.0.0.0:$WEB_PORT"
-echo "Web Log Port       : 0.0.0.0:$LOG_PORT"
 echo "PhpMyAdmin         : 0.0.0.0:8080"
 echo "============================================"
 echo ""
 
 # === Cek port ===
 echo "Mengecek ketersediaan port..."
-check_port "$WEB_PORT" && error_exit "Port $WEB_PORT sudah digunakan. Ubah konfigurasi port di $CONFIG_FILE"
-check_port "$LOG_PORT" && error_exit "Port $LOG_PORT sudah digunakan. Ubah konfigurasi port di $CONFIG_FILE"
+check_port "$WEB_PORT" && error_exit "Port $WEB_PORT sudah digunakan."
 echo "Semua port tersedia. Melanjutkan instalasi..."
 echo ""
 
@@ -85,7 +81,7 @@ fi
 echo ""
 
 # === Cek service existing ===
-CHECK_SERVICES=("logix-sensor.service" "logix-web.service" "logix-web-log.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service")
+CHECK_SERVICES=("logix-sensor.service" "logix-web.service" "logix-backup.service" "logix-klhk-send.service" "logix-klhk-retry.service" "logix-has-send.service")
 echo "Mengecek apakah service sudah ada..."
 found_existing=false
 for service in "${CHECK_SERVICES[@]}"; do
@@ -100,7 +96,6 @@ echo "Tidak ada konflik service. Lanjut instalasi..."
 echo ""
 
 # === Setup Directories ===
-APP_BASE="/home/pi/logix"
 LOG_DIR="$APP_BASE/logs"
 mkdir -p "$APP_BASE" "$LOG_DIR"
 echo "Direktori instalasi siap."
@@ -147,7 +142,6 @@ echo "Membuat service systemd..."
 SERVICES=(
     "logix-sensor|backend/main.py|sensor.log"
     "logix-web|backend/app.py|web.log"
-    "logix-web-log|backend/log.py|log.log"
     "logix-backup|backend/backup.py|backup.log"
     "logix-klhk-send|klhk/send.py|send.log"
     "logix-klhk-retry|klhk/retry.py|retry.log"
@@ -180,15 +174,6 @@ done
 echo "✅ Semua service systemd aktif."
 echo ""
 
-# === Log Cleanup Timer ===
-chmod +x "$APP_BASE/backend/log_cleanup.py"
-cp "$APP_BASE/logix-log-cleanup.service" /etc/systemd/system/
-cp "$APP_BASE/logix-log-cleanup.timer" /etc/systemd/system/
-systemctl daemon-reload
-systemctl enable logix-log-cleanup.timer
-systemctl start logix-log-cleanup.timer
-echo "Log cleanup timer aktif."
-echo ""
 
 # === Selesai ===
 echo "🎉 Instalasi logix selesai!"
@@ -196,6 +181,5 @@ echo "Gunakan perintah 'logix' di terminal."
 echo "============================================"
 echo "Aplikasi dapat diakses di:"
 echo "   - Web Interface: http://localhost:$WEB_PORT"
-echo "   - Log Viewer: http://localhost:$LOG_PORT"
 echo "   - PhpMyAdmin: http://localhost:8080"
 echo "============================================"
