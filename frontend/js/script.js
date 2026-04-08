@@ -621,7 +621,7 @@ function showConfirmationModal(title, message, subtitle, type, onConfirm) {
 // Restart & Shutdown dengan modal profesional
 document.getElementById("restart-btn").addEventListener("click", () => {
   showConfirmationModal(
-    "Restart Raspberry Pi",
+    "Restart",
     "Semua layanan akan dihentikan secara aman. Sistem akan restart dalam beberapa detik.",
     "Proses restart memerlukan beberapa menit",
     "warning",
@@ -634,7 +634,7 @@ document.getElementById("restart-btn").addEventListener("click", () => {
 
 document.getElementById("shutdown-btn").addEventListener("click", () => {
   showConfirmationModal(
-    "Matikan Raspberry Pi",
+    "Matikan",
     "Sistem akan dimatikan sepenuhnya. Anda perlu menyalakan kembali secara manual dengan menekan tombol power.",
     "Tindakan ini akan mematikan semua layanan",
     "danger",
