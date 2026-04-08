@@ -765,3 +765,134 @@ main {
         gap: 15px;
     }
 }
+
+/* ===== CONFIRMATION MODAL STYLING ===== */
+.confirmation-modal {
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.confirmation-modal .modal-header {
+    background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+}
+
+.confirmation-modal .modal-title {
+    color: #1f2937;
+    font-size: 1.25rem;
+    letter-spacing: -0.3px;
+}
+
+.confirmation-modal .modal-body {
+    background-color: #ffffff;
+}
+
+.confirmation-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.confirmation-icon-wrapper i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon wrapper untuk warning (restart) */
+.confirmation-modal.warning .confirmation-icon-wrapper {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #d97706;
+}
+
+/* Icon wrapper untuk danger (shutdown) */
+.confirmation-modal.danger .confirmation-icon-wrapper {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #dc2626;
+}
+
+/* Icon wrapper untuk success */
+.confirmation-modal.success .confirmation-icon-wrapper {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
+}
+
+/* Modal animation */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s cubic-bezier(0.36, 0, 0.66, -0.56), opacity 0.3s linear;
+}
+
+.modal.fade.show .modal-dialog {
+    transform: none;
+}
+
+.confirmation-modal .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.625rem 1.25rem;
+}
+
+.confirmation-modal .btn-outline-secondary {
+    border-color: #d1d5db;
+    color: #6b7280;
+}
+
+.confirmation-modal .btn-outline-secondary:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+    color: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-modal .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+}
+
+.confirmation-modal .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.confirmation-modal .btn-danger:active {
+    transform: translateY(0);
+}
+
+.confirmation-modal .modal-footer {
+    gap: 12px;
+    border-top: 1px solid #e5e7eb;
+    background-color: #fafbfc;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 576px) {
+    .confirmation-modal .modal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .confirmation-modal .btn-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+    
+    .confirmation-modal .modal-footer {
+        flex-direction: column;
+    }
+    
+    .confirmation-modal .btn {
+        width: 100%;
+    }
+}

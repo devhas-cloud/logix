@@ -11,8 +11,8 @@ async function initializeDashboard() {
 
         await updateAllData(); // Lakukan fetch data pertama kali
 
-        // Set interval untuk refresh data
-        setInterval(updateAllData, 30000); // Refresh setiap 30 detik
+        // Set interval untuk refresh data setiap 1 menit pada detik :00
+        startClockAlignedScheduler(updateAllData, 60, 0);
 
     } catch (e) {
         console.error("Gagal inisialisasi dashboard:", e);
@@ -21,6 +21,45 @@ async function initializeDashboard() {
 
 
 initializeDashboard();
+
+// Fungsi scheduler untuk interval tetap (10 detik)
+function startIntervalScheduler(task, intervalSeconds = 30) {
+    let lastRun = 0;
+    
+    function checkAndRun() {
+        const now = Date.now();
+        
+        if (now - lastRun >= intervalSeconds * 1000) {
+            lastRun = now;
+            task(new Date());
+        }
+    }
+    
+    setInterval(checkAndRun, 100);
+}
+
+// Fungsi scheduler untuk waktu real (sinkron dengan jam sistem pada detik tertentu)
+function startClockAlignedScheduler(task, intervalSeconds = 60, targetSecond = 0) {
+    let lastRun = 0;
+    
+    function checkAndRun() {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const milliseconds = now.getMilliseconds();
+        const timestamp = now.getTime();
+        
+        // Check jika sudah melewati target second dan belum dijalankan di cycle ini
+        const shouldRun = seconds === targetSecond && 
+                         timestamp - lastRun >= intervalSeconds * 1000;
+        
+        if (shouldRun) {
+            lastRun = timestamp;
+            task(now);
+        }
+    }
+    
+    setInterval(checkAndRun, 500);
+}
 
 // Mengatur UI berdasarkan file config.json
 function setupUIFromConfig() {
@@ -434,19 +473,17 @@ async function loadUsbOptions() {
 
 loadUsbOptions(); // Panggil saat halaman dimuat
 
-
-setInterval(() => {
+startIntervalScheduler(() => {
    loadUsbOptions();
-}, 10000);
+}, 10);
 
-// Auto refresh tiap 1 menit
-setInterval(() => {
+// Auto refresh chart dan windrose setiap 1 menit pada detik :00
+startClockAlignedScheduler(() => {
     const param = document.getElementById('param-select').value;
     const range = document.getElementById('time-range').value;
-    //fetchHistory(param, range);
     renderHistoryChart(param, range);
     renderWindRose(range);
-}, 30000);
+}, 60, 0);
 
 
 //wifi deteksi
@@ -472,9 +509,22 @@ function updateWifiStatusUI() {
     });
 }
 
-// Jalankan saat halaman dimuat dan setiap 30 detik
+// Jalankan saat halaman dimuat dan jadwalkan setiap 10 detik
 updateWifiStatusUI();
-setInterval(updateWifiStatusUI, 30000);
+startIntervalScheduler(updateWifiStatusUI, 20);
+
+// Auto reload halaman setiap 10 menit dengan tracking
+let lastReloadTime = Date.now();
+setInterval(() => {
+    const now = Date.now();
+    
+    // Reload hanya jika sudah 10 menit (600000 ms) sejak reload terakhir
+    if (now - lastReloadTime >= 600000) {
+        lastReloadTime = now;
+        console.log('Auto reloading dashboard...');
+        location.reload();
+    }
+}, 60000); // Check setiap 1 menit
 
 
 // Fungsi untuk load SSID saat modal dibuka
@@ -523,16 +573,76 @@ document.getElementById("wifi-form").addEventListener("submit", function(e) {
   });
 });
 
-// Restart & Shutdown (pastikan backend endpoint tersedia)
+// Fungsi untuk menampilkan modal konfirmasi dengan styling profesional
+function showConfirmationModal(title, message, subtitle, type, onConfirm) {
+  const modalElement = document.getElementById('confirmationModal');
+  const modal = new bootstrap.Modal(modalElement);
+  
+  // Set content
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  document.getElementById('confirmSubtitle').textContent = subtitle || 'Tindakan ini tidak dapat dibatalkan';
+  
+  // Update modal class berdasarkan type
+  modalElement.classList.remove('warning', 'danger', 'success');
+  if (type) {
+    modalElement.querySelector('.confirmation-modal').classList.remove('warning', 'danger', 'success');
+    modalElement.querySelector('.confirmation-modal').classList.add(type);
+  }
+  
+  // Update icon sesuai type
+  const iconWrapper = document.getElementById('confirmIconWrapper');
+  const iconMap = {
+    'warning': 'bi-exclamation-circle-fill',
+    'danger': 'bi-exclamation-triangle-fill',
+    'success': 'bi-check-circle-fill'
+  };
+  
+  const iconClass = iconMap[type] || 'bi-exclamation-circle-fill';
+  iconWrapper.innerHTML = `<i class="bi ${iconClass}"></i>`;
+  
+  // Hapus event listener sebelumnya
+  const confirmYesBtn = document.getElementById('confirmYes');
+  const newConfirmYesBtn = confirmYesBtn.cloneNode(true);
+  confirmYesBtn.parentNode.replaceChild(newConfirmYesBtn, confirmYesBtn);
+  
+  // Tambah event listener baru
+  document.getElementById('confirmYes').addEventListener('click', () => {
+    modal.hide();
+    onConfirm();
+  });
+  
+  // Focus pada tombol batal untuk accessibility
+  document.getElementById('confirmCancel').focus();
+  
+  modal.show();
+}
+
+// Restart & Shutdown dengan modal profesional
 document.getElementById("restart-btn").addEventListener("click", () => {
-  if (confirm("Yakin ingin merestart Raspberry Pi?")) {
-    fetch('/api/system/restart', { method: 'POST' });
-  }
+  showConfirmationModal(
+    "Restart Raspberry Pi",
+    "Semua layanan akan dihentikan secara aman. Sistem akan restart dalam beberapa detik.",
+    "Proses restart memerlukan beberapa menit",
+    "warning",
+    () => {
+      fetch('/api/system/restart', { method: 'POST' })
+        .catch(err => console.error('Restart error:', err));
+    }
+  );
 });
+
 document.getElementById("shutdown-btn").addEventListener("click", () => {
-  if (confirm("Yakin ingin mematikan Raspberry Pi?")) {
-    fetch('/api/system/shutdown', { method: 'POST' });
-  }
+  showConfirmationModal(
+    "Matikan Raspberry Pi",
+    "Sistem akan dimatikan sepenuhnya. Anda perlu menyalakan kembali secara manual dengan menekan tombol power.",
+    "Tindakan ini akan mematikan semua layanan",
+    "danger",
+    () => {
+      fetch('/api/system/shutdown', { method: 'POST' })
+        .catch(err => console.error('Shutdown error:', err));
+    }
+  );
 });
 
 

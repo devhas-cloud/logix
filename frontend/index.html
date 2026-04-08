@@ -333,6 +333,37 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content border-0 confirmation-modal">
+                <div class="modal-header border-0 p-4 pb-2">
+                    <div class="d-flex align-items-center w-100">
+                        <div class="confirmation-icon-wrapper me-3" id="confirmIconWrapper">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-600 mb-0" id="confirmTitle">Konfirmasi Aksi</h5>
+                            <small class="text-muted" id="confirmSubtitle">Tindakan ini tidak dapat dibatalkan</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body px-4 py-3">
+                    <p id="confirmMessage" class="mb-0 fs-6 text-muted lh-lg">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+                </div>
+                <div class="modal-footer border-top p-4 bg-light bg-opacity-50">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" id="confirmCancel">
+                        <i class="bi bi-x-circle me-2"></i>Batal
+                    </button>
+                    <button type="button" class="btn btn-danger px-4 fw-600" id="confirmYes">
+                        <i class="bi bi-check-circle me-2"></i>Ya, Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="dashboard-footer">
         <div class="footer-section left">
             <i class="bi bi-cpu"></i>
