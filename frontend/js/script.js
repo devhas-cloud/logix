@@ -86,6 +86,14 @@ function setupUIFromConfig() {
             displayText = 'Pressure';
         }
 
+        if (displayText.toLowerCase() === 'nh3n') {
+            displayText = 'Ammonia';
+        }
+
+        if (displayText.toLowerCase() === 'wtemp') {
+            displayText = 'Temperature';
+        }
+
         opt.textContent = displayText;
         paramSelect.appendChild(opt);
     });
@@ -340,9 +348,22 @@ async function renderHistoryChart() {
             connectgaps: false // Pastikan tidak menghubungkan titik null
         };
 
+        let displayText = param.toUpperCase();
+        if (displayText.toLowerCase() === 'press') {
+            displayText = 'Pressure';
+        }
+        
+        if (displayText.toLowerCase() === 'nh3n') {
+            displayText = 'Ammonia';
+        }
+
+        if (displayText.toLowerCase() === 'wtemp') {
+            displayText = 'Temperature';
+        }
+
         const layout = {
             margin: { t: 40, b: 70, l: 50, r: 20 },
-            title: `History of ${param.toUpperCase()}`,
+            title: `History of ${displayText}`,
             xaxis: { title: 'Waktu', tickangle: -45, tickformat: "%Y-%m-%d<br>%H:%M" },
             yaxis: { title: 'Nilai' },
             plot_bgcolor: '#fafafa',

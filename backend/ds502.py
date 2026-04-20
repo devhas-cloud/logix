@@ -1,6 +1,7 @@
 import serial
 import struct
 import time
+import os
 from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
@@ -134,7 +135,7 @@ def get_ds502_data():
     if not os.path.exists(DS502_PORT):
         print(f"[ERROR] Port {DS502_PORT} tidak tersedia. Membatalkan pembacaan.")
         send_connection_log(f"Port Sensor DS502 {DS502_PORT} tidak tersedia.")
-        return
+        return (None,) * 7
 
     try:
         print("[INFO] Modul DS502 aktif. Melakukan pembacaan data.")

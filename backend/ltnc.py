@@ -1,6 +1,7 @@
 import serial
 import struct
 import time
+import os
 from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
@@ -83,7 +84,7 @@ def get_ltnc_data():
     if not os.path.exists(LTNC_PORT):
         print(f"[ERROR] Port {LTNC_PORT} tidak tersedia. Membatalkan pembacaan.")
         send_connection_log(f"Port LT-NC {LTNC_PORT} tidak tersedia.")
-        return
+        return (None,) * 2
 
     try:
         print("[INFO] Modul LTNC aktif. Melakukan pembacaan data.")

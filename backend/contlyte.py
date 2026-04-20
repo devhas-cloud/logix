@@ -1,6 +1,7 @@
 import serial
 import struct
 import time
+import os
 from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
@@ -97,7 +98,7 @@ def get_conlyte_data():
     if not os.path.exists(CONTLYTE_PORT):
         print(f"Port {CONTLYTE_PORT} tidak tersedia. Membatalkan semua pembacaan.")
         send_connection_log(f"Port CONTLYTE {CONTLYTE_PORT} tidak tersedia.")
-        return
+        return None, None, None, None
 
     else:
         print("[INFO] Modul CONTLYTE aktif. Melakukan pembacaan data.")

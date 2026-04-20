@@ -1,6 +1,7 @@
 import serial
 import struct
 import time
+import os
 from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 

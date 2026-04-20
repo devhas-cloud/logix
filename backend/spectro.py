@@ -1,6 +1,7 @@
 import socket
 import struct
 import time
+import os
 from config import loadConfig
 from logsSend import send_network_log, send_connection_log, send_sensor_log
 
@@ -54,7 +55,7 @@ def read_modbus_tcp():
         else:
             print(f"[WARNING] Koneksi ke {ip} gagal.")
             send_network_log(f"Gagal koneksi ke sensor SPECTRO di IP {ip}.")
-            return
+            return None,None,None,None,None,None
     except Exception as e:
         print(f"[ERROR] Terjadi error saat memeriksa koneksi: {e}")
         send_network_log(f"Error saat memeriksa koneksi ke sensor SPECTRO di IP {ip}: {e}")
