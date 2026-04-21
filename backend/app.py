@@ -420,14 +420,23 @@ def wifi_status():
                 if len(parts) > 1:
                     ssid_connected = parts[1]
                 break
+        # IP address
+        ip_address = "-"
+        try:
+            result = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
+            ip_address = result.stdout.strip().split()[0] if result.stdout.strip() else "-"
+        except Exception as e:
+            print(f"IP address retrieval error: {e}")
+
 
         ping_check = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
         connected = ping_check.returncode == 0
 
-        return jsonify({'connected': connected, 'ssid': ssid_connected})
+        return jsonify({'connected': connected, 'ssid': ssid_connected, 'ip': ip_address})
     except Exception as e:
         print(f"WiFi status error: {e}")
-        return jsonify({'connected': False, 'ssid': '-'})
+        return jsonify({'connected': False, 'ssid': '-', 'ip': '-'})
+
 
 
 @app.route('/api/wifi-scan')

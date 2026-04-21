@@ -1,0 +1,160 @@
+/* Gaya Keyboard Virtual - RESPONSIVE */
+.keyboard {
+    position: fixed;
+    left: 50%;
+    bottom: 10px;
+    /* Sedikit lebih dekat ke bawah */
+    transform: translateX(-50%);
+    width: 100%;
+    /* Gunakan lebar penuh di layar kecil */
+    max-width: 800px;
+    /* Maksimal lebar di layar besar */
+    background-color: #e4e4e7;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+
+    /* Sembunyikan keyboard secara default */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    /* Tambahkan z-index tinggi untuk memastikan keyboard muncul di atas modal */
+    z-index: 1060;
+    /* Bootstrap modal z-index adalah 1055, jadi kita gunakan nilai yang lebih tinggi */
+}
+
+/* Tampilkan keyboard saat kelas 'active' ditambahkan */
+.keyboard.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin: 3px 0;
+    /* Kurangi margin vertikal */
+}
+
+.key {
+    padding: 12px;
+    /* Padding dasar */
+    margin: 0 3px;
+    /* Margin horizontal dasar */
+    min-width: 35px;
+    /* Lebar minimum dasar */
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    /* Gunakan clamp() untuk font size yang responsif */
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    text-transform: lowercase;
+    user-select: none;
+    /* Mencegah seleksi teks saat tombol ditekan berulang kali */
+    transition: background-color 0.2s, transform 0.1s;
+    flex-grow: 1;
+    /* Biarkan tombol tumbuh untuk mengisi ruang kosong */
+    flex-basis: 0;
+    /* Dasar untuk flex-grow */
+}
+
+.key:hover {
+    background-color: #f3f4f6;
+}
+
+.key:active {
+    transform: scale(0.95);
+    background-color: #d1d5db;
+}
+
+/* Gaya khusus untuk tombol yang lebih lebar */
+.key.wide {
+    flex-grow: 1.5;
+    /* Biarkan tombol lebar tumbuh lebih banyak */
+    min-width: 60px;
+    /* Lebar minimum yang lebih kecil untuk responsivitas */
+}
+
+.key.extra-wide {
+    flex-grow: 4;
+    /* Spasi tumbuh lebih signifikan */
+    min-width: 150px;
+    /* Lebar minimum yang lebih kecil */
+}
+
+/* Gaya untuk tombol yang sedang aktif (Shift, Caps Lock) */
+.key.active {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* Tambahkan style untuk modal backdrop agar tidak menutup saat klik keyboard */
+.modal-backdrop {
+    z-index: 1040;
+}
+
+/* Tambahkan style untuk modal agar keyboard tidak menyebabkan modal tertutup */
+#wifiModal {
+    z-index: 1050;
+}
+
+/* --- MEDIA QUERY UNTUK RESPONSIVITAS --- */
+
+/* Untuk Tablet dan Layar Lebih Kecil (max-width: 768px) */
+@media (max-width: 768px) {
+    .keyboard {
+        width: 98%;
+        /* Gunakan hampir seluruh lebar */
+        bottom: 5px;
+        padding: 8px;
+    }
+
+    .key {
+        padding: 10px;
+        margin: 0 2px;
+        min-width: 30px;
+    }
+
+    .key.wide {
+        min-width: 55px;
+    }
+
+    .key.extra-wide {
+        min-width: 120px;
+    }
+}
+
+/* Untuk Ponsel (max-width: 480px) */
+@media (max-width: 480px) {
+    .keyboard {
+        width: 100%;
+        /* Lebar penuh */
+        bottom: 0;
+        /* Menempel di bawah layar */
+        border-radius: 8px 8px 0 0;
+        /* Hanya sudut atas yang melengkung */
+        padding: 5px;
+    }
+
+    .keyboard-row {
+        margin: 2px 0;
+    }
+
+    .key {
+        padding: 8px;
+        margin: 0 1px;
+        min-width: 25px;
+        font-size: clamp(0.8rem, 3vw, 1rem);
+        /* Font sedikit lebih kecil di ponsel */
+    }
+
+    .key.wide {
+        min-width: 45px;
+    }
+
+    .key.extra-wide {
+        min-width: 100px;
+    }
+}

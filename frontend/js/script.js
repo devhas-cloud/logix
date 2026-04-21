@@ -136,12 +136,47 @@ function setupUIFromConfig() {
 
 // Inisialisasi peta Leaflet
 function initializeMap() {
-    const { latitude, longitude } = config.geo;
-    map = L.map('map', { attributionControl: false }).setView([latitude, longitude], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: ''
-    }).addTo(map);
-    marker = L.marker([latitude, longitude]).addTo(map).bindPopup("Lokasi Sensor").openPopup();
+    try {
+        // Cek apakah Leaflet library tersedia
+        if (typeof L === 'undefined') {
+            console.warn("⚠️ Leaflet library belum dimuat, peta tidak dapat diinisialisasi");
+            return;
+        }
+
+        // Validasi config.geo
+        if (!config.geo || typeof config.geo.latitude !== 'number' || typeof config.geo.longitude !== 'number') {
+            console.warn("⚠️ Koordinat tidak valid, peta tidak dapat diinisialisasi");
+            return;
+        }
+
+        // Validasi element map ada
+        const mapElement = document.getElementById('map');
+        if (!mapElement) {
+            console.warn("⚠️ Element map tidak ditemukan di DOM");
+            return;
+        }
+
+        const { latitude, longitude } = config.geo;
+        map = L.map('map', { attributionControl: false }).setView([latitude, longitude], 13);
+        
+        // Tambahkan tile layer dengan error handling
+        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '',
+            maxRetries: 2
+        });
+        
+        tileLayer.on('tileerror', function(error) {
+            console.warn("⚠️ Gagal memuat tile peta, periksa koneksi internet");
+        });
+        
+        tileLayer.addTo(map);
+        marker = L.marker([latitude, longitude]).addTo(map).bindPopup("Lokasi Sensor").openPopup();
+        
+        console.log("✅ Peta berhasil diinisialisasi");
+    } catch (e) {
+        console.error("❌ Gagal inisialisasi peta:", e.message);
+        // Aplikasi tetap berjalan meskipun peta gagal dimuat
+    }
 }
 
 // Fungsi untuk mengambil data terbaru dan memperbarui kartu
@@ -515,18 +550,26 @@ function updateWifiStatusUI() {
     .then(data => {
       const dot = document.getElementById("wifi-status-dot");
       const statusText = document.getElementById("wifi-current-status");
+      const ipAddressInput = document.getElementById("wifi-ip-address");
 
       if (data.connected) {
         dot.style.backgroundColor = "green";
         statusText.innerText = `Terhubung ke WiFi: ${data.ssid}`;
+        ipAddressInput.innerText = `IP Address: ${data.ip || '-'}`;
+        // hiden 
+        ipAddressInput.style.display = 'block';
       } else {
         dot.style.backgroundColor = "red";
         statusText.innerText = `Tidak terhubung ke jaringan manapun.`;
+        ipAddressInput.innerText = "IP Address: -";
+        ipAddressInput.style.display = 'none';
       }
     })
     .catch(err => {
       document.getElementById("wifi-status-dot").style.backgroundColor = "red";
       document.getElementById("wifi-current-status").innerText = "Gagal mendapatkan status koneksi.";
+      document.getElementById("wifi-ip-address").innerText = "IP Address: -";
+      document.getElementById("wifi-ip-address").style.display = 'none';
     });
 }
 

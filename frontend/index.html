@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,17 +9,24 @@
     <link rel="shortcut icon" type="image/png" href="/images/logo.png" />
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/style.css" />
+
+    <!-- Bootstrap CSS & JS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Maps Lib-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- JS Libraries -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- Tambahkan ke head -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    
+
+    <!-- Grafik JS Libraries -->
+    <script src="/js/plotly-latest.min.js"></script>
+
+    <!-- Flatpickr Calender-->
+    <link rel="stylesheet" href="/css/flatpickr.min.css">
+    <script src="/js/flatpickr.js"></script>
+
+    <!-- Virtual Keyboard -->
+    <link rel="stylesheet" href="/css/keyboard.css" />
     <!-- Prevent Text Selection -->
     <style>
         * {
@@ -28,8 +36,11 @@
             -ms-user-select: none;
         }
     </style>
-    
+
+
+
 </head>
+
 <body>
     <header>
         <div class="header-container">
@@ -41,12 +52,13 @@
             </div>
             <div class="header-right">
                 <div class="location-info">
-                    <i class="bi bi-geo-alt"></i>
+                    <img src="/images/geo-alt.svg" alt="Location Icon" class="location-icon me-1"  />
                     <span id="map-location">Pt smart media</span>
                 </div>
                 <div class="wifi-button-container">
-                    <button id="wifi-icon-btn" class="wifi-button" data-bs-toggle="modal" data-bs-target="#wifiModal" title="Pilih Jaringan WiFi">
-                        <i class="bi bi-wifi"></i>
+                    <button id="wifi-icon-btn" class="wifi-button" data-bs-toggle="modal" data-bs-target="#wifiModal"
+                        title="Pilih Jaringan WiFi">
+                        <img src="/images/wifi.svg" alt="WiFi Icon" class="wifi-icon" />
                         <span class="wifi-indicator" id="wifi-status-dot"></span>
                     </button>
                 </div>
@@ -278,7 +290,7 @@
                     <input type="datetime-local" class="form-control" id="end-datetime" step="any">
                 </div>
             </div>
-            
+
             <div class="export-controls">
                 <div class="export-group">
                     <label for="export-destination" class="form-label">Export to:</label>
@@ -287,8 +299,8 @@
                     </select>
                 </div>
                 <div class="export-button">
-                    <button id="export-btn" class="btn btn-success w-100"> 
-                        <i class="bi bi-download"></i>
+                    <button id="export-btn" class="btn btn-success w-100">
+                        <img src="/images/download.svg" alt="Export Icon" class="export-icon me-2" />
                         <span>Export Data</span>
                     </button>
                 </div>
@@ -296,15 +308,15 @@
                     <div id="export-status" class="form-text mt-1"></div>
                 </div>
             </div>
-            
+
             <!-- Tombol restart dan shutdown di bawah export -->
             <div class="device-controls">
                 <button id="restart-btn" class="device-control-btn restart-btn" title="Restart Device">
-                    <i class="bi bi-arrow-clockwise"></i>
+                   <img src="/images/arrow-clockwise.svg" alt="Restart Icon" class="restart-icon me-2" />
                     <span class="btn-text">Restart</span>
                 </button>
                 <button id="shutdown-btn" class="device-control-btn shutdown-btn" title="Shutdown Device">
-                    <i class="bi bi-power"></i>
+                    <img src="/images/power.svg" alt="Shutdown Icon" class="shutdown-icon me-2" />
                     <span class="btn-text">Shutdown</span>
                 </button>
             </div>
@@ -322,6 +334,8 @@
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-info p-2" id="wifi-current-status">Status: Memeriksa...</div>
+                        <div class="alert alert-success p-2" id="wifi-ip-address">IP Address: Memeriksa...</div>
+                        
                         <div class="mb-3">
                             <label for="ssid" class="form-label">SSID</label>
                             <select class="form-select" id="ssid" required>
@@ -330,7 +344,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="wifi-password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="wifi-password" placeholder="Password (jika perlu)" />
+                            <input type="password" class="form-control" id="wifi-password"
+                                placeholder="Password (jika perlu)" />
                         </div>
                         <div id="wifi-status" class="text-muted small"></div>
                     </div>
@@ -343,13 +358,14 @@
     </div>
 
     <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-md">
             <div class="modal-content border-0 confirmation-modal">
                 <div class="modal-header border-0 p-4 pb-2">
                     <div class="d-flex align-items-center w-100">
                         <div class="confirmation-icon-wrapper me-3" id="confirmIconWrapper">
-                            <i class="bi bi-exclamation-circle-fill"></i>
+                            <img src="/images/exclamation-circle-fill.svg" alt="Warning Icon" class="confirmation-icon" />
                         </div>
                         <div>
                             <h5 class="modal-title fw-600 mb-0" id="confirmTitle">Konfirmasi Aksi</h5>
@@ -359,36 +375,42 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body px-4 py-3">
-                    <p id="confirmMessage" class="mb-0 fs-6 text-muted lh-lg">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+                    <p id="confirmMessage" class="mb-0 fs-6 text-muted lh-lg">Apakah Anda yakin ingin melakukan tindakan
+                        ini?</p>
                 </div>
                 <div class="modal-footer border-top p-4 bg-light bg-opacity-50">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" id="confirmCancel">
-                        <i class="bi bi-x-circle me-2"></i>Batal
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal"
+                        id="confirmCancel">
+                        <img src="/images/x-circle-fill.svg" alt="Cancel Icon" class="me-2" />Batal
                     </button>
                     <button type="button" class="btn btn-danger px-4 fw-600" id="confirmYes">
-                        <i class="bi bi-check-circle me-2"></i>Ya, Lanjutkan
+                        <img src="/images/check-circle.svg" alt="Confirm Icon" class="me-2" />Ya, Lanjutkan
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+        <!-- Wadah untuk keyboard virtual -->
+    <div id="keyboard" class="keyboard"></div>
+
     <footer class="dashboard-footer">
         <div class="footer-section left">
-            <i class="bi bi-cpu"></i>
+            <img src="/images/cpu.svg" alt="CPU Icon" class="me-2" />
             <span id="footer-device">Device: -</span>
         </div>
         <div class="footer-section center">
-            <i class="bi bi-c-circle"></i>
+            <img src="/images/c-circle.svg" alt="Company Icon" class="me-2" />
             <span id="footer-copy">Copyright © 2025 Has Environmental</span>
         </div>
         <div class="footer-section right">
-            <i class="bi bi-tag"></i>
+            <img src="/images/tag.svg" alt="Version Icon" class="me-2" />
             <span id="footer-version">V: -</span>
         </div>
     </footer>
 
     <script src="/js/script.js"></script>
+    <script src="/js/keyboard.js"></script>
     <script>
         flatpickr("#start-datetime", {
             enableTime: true,
@@ -403,5 +425,8 @@
             defaultDate: new Date(),
         });
     </script>
+
+   
 </body>
+
 </html>
