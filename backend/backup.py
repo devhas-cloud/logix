@@ -57,7 +57,7 @@ def save_state(state):
         with open(STATE_FILE, 'w') as f:
             json.dump(state, f)
     except Exception as e:
-        print(f"[{ambilDate}] ❌ Gagal menyimpan state: {e}")
+        print(f"[{ambilDate}]Gagal menyimpan state: {e}")
 
 # === Backup Database (MySQL Dump) ===
 def backup_database():
@@ -67,7 +67,7 @@ def backup_database():
     gz_path = sql_path + ".gz"
 
     if os.path.exists(gz_path):
-        print("✅ Backup hari ini sudah ada.")
+        print(f"[{ambilDate}]Backup hari ini sudah ada.")
         return False
 
     try:
@@ -84,10 +84,10 @@ def backup_database():
         # Kompres file .sql menjadi .sql.gz
         subprocess.run(["gzip", sql_path], check=True)
 
-        print(f"[{ambilDate}] ✅ Backup berhasil dibuat: {gz_path}")
+        print(f"[{ambilDate}]Backup berhasil dibuat: {gz_path}")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"[{ambilDate}] ❌ Gagal backup database: {e}")
+        print(f"[{ambilDate}]Gagal backup database: {e}")
         return False
 
 # === Hapus Backup Lama (> 30 hari) ===
@@ -100,9 +100,9 @@ def cleanup_old_backups():
                 file_date = datetime.strptime(date_str, "%Y-%m-%d")
                 if file_date < cutoff:
                     os.remove(os.path.join(BACKUP_DIR, fname))
-                    print(f"[{ambilDate}] 🗑️ Backup lama dihapus: {fname}")
+                    print(f"[{ambilDate}]Backup lama dihapus: {fname}")
             except Exception as e:
-                print(f"[{ambilDate}] ⚠️ Tidak bisa memproses backup: {fname} => {e}")
+                print(f"[{ambilDate}]Tidak bisa memproses backup: {fname} => {e}")
 
 # === Optimasi Database (hapus >13 bulan) ===
 def optimize_database():
@@ -113,18 +113,18 @@ def optimize_database():
 
         cur.execute("DELETE FROM data WHERE date < %s", (cutoff,))
         deleted = cur.rowcount
-        print(f"[{ambilDate}] 🧹 Menghapus {deleted} baris data lebih dari 13 bulan.")
+        print(f"[{ambilDate}]Menghapus {deleted} baris data lebih dari 13 bulan.")
 
         conn.commit()
         cur.close()
         conn.close()
-        print("✅ Database dioptimasi (tanpa VACUUM untuk MySQL).")
+        print(f"[{ambilDate}]Database dioptimasi (tanpa VACUUM untuk MySQL).")
     except Error as e:
-        print(f"[{ambilDate}] ❌ Gagal optimasi database: {e}")
+        print(f"[{ambilDate}]Gagal optimasi database: {e}")
 
 # === Main Loop ===
 def main_loop():
-    print("🚀 Memulai background backup mingguan (malam hari)...")
+    print("Memulai background backup mingguan (malam hari)...")
     state = load_state()
 
     while True:
@@ -142,14 +142,14 @@ def main_loop():
                 if now - last_backup_date >= timedelta(days=7):
                     do_backup = True
             except Exception as e:
-                print(f"[{ambilDate}] ⚠️ Format last_backup salah: {e}")
+                print(f"[{ambilDate}]Format last_backup salah: {e}")
                 do_backup = True
         else:
             do_backup = True
 
         # Jalankan hanya malam hari (00:00–01:00)
         if 0 <= hour < 1 and do_backup:
-            print(f"[{ambilDate}] 🌙 Malam hari & waktunya backup mingguan. Menjalankan proses...")
+            print(f"[{ambilDate}]Malam hari & waktunya backup mingguan. Menjalankan proses...")
             if backup_database():
                 state["last_backup"] = today_str
                 save_state(state)
@@ -157,9 +157,9 @@ def main_loop():
                 optimize_database()
         else:
             if not do_backup:
-                print(f"[{ambilDate}] 📅 Belum waktunya backup mingguan.")
+                print(f"[{ambilDate}]Belum waktunya backup mingguan.")
             elif not (0 <= hour < 1):
-                print(f"[{ambilDate}] 🕓 Bukan malam hari. Menunggu waktu 00:00–01:00.")
+                print(f"[{ambilDate}]Bukan malam hari. Menunggu waktu 00:00–01:00.")
 
         time.sleep(3600)  # cek tiap 1 jam
 
@@ -168,6 +168,6 @@ if __name__ == "__main__":
     try:
         main_loop()
     except KeyboardInterrupt:
-        print("🛑 Dihentikan oleh pengguna.")
+        print(f"[{ambilDate}]Dihentikan oleh pengguna.")
     except Exception as e:
-        print(f"[{ambilDate}] ❌ Fatal error: {e}")
+        print(f"[{ambilDate}]Fatal error: {e}")

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,18 +8,19 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
+
         .login-container {
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100%;
         }
-        
+
         .login-box {
             background: white;
             border-radius: 12px;
@@ -27,36 +29,36 @@
             width: 100%;
             max-width: 400px;
         }
-        
+
         .login-header {
             text-align: center;
             margin-bottom: 40px;
         }
-        
+
         .login-header h1 {
             font-size: 28px;
             color: #333;
             margin-bottom: 10px;
             font-weight: 700;
         }
-        
+
         .login-header p {
             color: #666;
             font-size: 14px;
             margin: 0;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             font-weight: 600;
             color: #333;
             margin-bottom: 8px;
             font-size: 14px;
         }
-        
+
         .form-control {
             border: 1px solid #ddd;
             border-radius: 6px;
@@ -64,12 +66,12 @@
             font-size: 14px;
             transition: all 0.3s ease;
         }
-        
+
         .form-control:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
-        
+
         .btn-login {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
@@ -82,49 +84,49 @@
             margin-top: 10px;
             font-size: 14px;
         }
-        
+
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
             color: white;
         }
-        
+
         .btn-login:active {
             transform: translateY(0);
         }
-        
+
         .btn-login:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        
+
         .alert {
             border-radius: 6px;
             margin-bottom: 20px;
             border: none;
             font-size: 14px;
         }
-        
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
         }
-        
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
         }
-        
+
         .spinner-border {
             width: 1.5rem;
             height: 1.5rem;
             margin-right: 8px;
         }
-        
+
         .form-control::placeholder {
             color: #aaa;
         }
-        
+
         .password-toggle {
             position: absolute;
             right: 12px;
@@ -135,15 +137,15 @@
             border: none;
             padding: 6px;
         }
-        
+
         .password-toggle:hover {
             color: #764ba2;
         }
-        
+
         .input-group-relative {
             position: relative;
         }
-        
+
         .footer-text {
             text-align: center;
             margin-top: 20px;
@@ -152,6 +154,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-box">
@@ -159,71 +162,57 @@
                 <h1><i class="bi bi-gear-fill"></i>LOGIX</h1>
                 <p>Enter your credentials to access settings</p>
             </div>
-            
+
             <div id="alertContainer"></div>
-            
+
             <form id="loginForm">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="username" 
-                        placeholder="Enter username" 
-                        required
-                        autocomplete="username"
-                    >
+                    <input type="text" class="form-control" id="username" placeholder="Enter username" required
+                        autocomplete="username">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <div class="input-group-relative">
-                        <input 
-                            type="password" 
-                            class="form-control" 
-                            id="password" 
-                            placeholder="Enter password" 
-                            required
-                            autocomplete="current-password"
-                        >
-                        <button 
-                            type="button" 
-                            class="password-toggle" 
-                            id="passwordToggle"
-                            onclick="togglePassword()"
-                        >
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" required
+                            autocomplete="current-password">
+                        <button class="btn btn-outline-secondary" type="button" id="passwordToggle"
+                            aria-label="Toggle password visibility">
                             <i class="bi bi-eye-fill"></i>
                         </button>
                     </div>
                 </div>
-                
+
                 <button type="submit" class="btn-login" id="loginBtn">
                     <span id="btnText">Login</span>
                 </button>
             </form>
-            
+
         </div>
     </div>
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script>
-        function togglePassword() {
-            const passwordField = document.getElementById('password');
-            const toggleBtn = document.getElementById('passwordToggle');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggleBtn.innerHTML = '<i class="bi bi-eye-slash-fill"></i>';
-            } else {
-                passwordField.type = 'password';
-                toggleBtn.innerHTML = '<i class="bi bi-eye-fill"></i>';
-            }
-        }
         
+
+        const toggleBtn = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+
+        toggleBtn.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            this.innerHTML = type === 'password' 
+                ? '<i class="bi bi-eye-fill"></i>' 
+                : '<i class="bi bi-eye-slash-fill"></i>';
+        });
+
+
         function showAlert(message, type = 'danger') {
             const alertContainer = document.getElementById('alertContainer');
             const alertId = 'alert-' + Date.now();
-            
+
             const alertHTML = `
                 <div class="alert alert-${type} alert-dismissible fade show" id="${alertId}" role="alert">
                     ${type === 'danger' ? '<i class="bi bi-exclamation-circle"></i>' : '<i class="bi bi-check-circle"></i>'}
@@ -231,28 +220,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `;
-            
+
             alertContainer.innerHTML = alertHTML;
         }
-        
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            
+
             if (!username || !password) {
                 showAlert('Please enter both username and password');
                 return;
             }
-            
+
             const loginBtn = document.getElementById('loginBtn');
             const btnText = document.getElementById('btnText');
             const originalText = btnText.textContent;
-            
+
             loginBtn.disabled = true;
             btnText.innerHTML = '<span class="spinner-border spinner-border-sm"></span>Logging in...';
-            
+
             try {
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
@@ -265,9 +254,9 @@
                         password: password
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showAlert('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
@@ -285,13 +274,13 @@
                 btnText.textContent = originalText;
             }
         });
-        
+
         // Check if already authenticated
         async function checkAuth() {
             try {
                 const response = await fetch('/api/auth/status');
                 const data = await response.json();
-                
+
                 if (data.authenticated) {
                     // Already logged in, redirect to admin
                     window.location.href = '/admin';
@@ -300,12 +289,13 @@
                 console.error('Auth check error:', error);
             }
         }
-        
+
         // Check authentication on page load
         document.addEventListener('DOMContentLoaded', checkAuth);
-        
+
         // Focus on username field on load
         document.getElementById('username').focus();
     </script>
 </body>
+
 </html>

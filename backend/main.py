@@ -18,6 +18,7 @@ from ph200 import get_ph200_data
 from tss200x import get_tss200x_data
 from xymd02 import get_xymd02_data
 from logsSend import send_network_log, send_connection_log, send_sensor_log
+from clean_logs import clean_all_logs
 import sqlite3
 import pytz
 
@@ -47,44 +48,6 @@ H1601_STATUS = CONFIG_DB.get('h1601_status', 'inactive')
 PH200_STATUS = CONFIG_DB.get('ph200_status', 'inactive')
 TSS200X_STATUS = CONFIG_DB.get('tss200x_status', 'inactive')
 XYMD02_STATUS = CONFIG_DB.get('xymd02_status', 'inactive')
-
-
-
-
-def cleanup_log_file(filepath, max_lines=6000):
-    """Membersihkan file log dan menyisakan max_lines baris terakhir"""
-    if not os.path.exists(filepath):
-        print(f"⚠️  File tidak ditemukan: {filepath}")
-        return False
-    
-    try:
-        # Baca semua baris
-        with open(filepath, 'r') as f:
-            lines = f.readlines()
-        
-        original_lines = len(lines)
-        
-        # Jika file sudah kecil, skip
-        if original_lines <= max_lines:
-            print(f"✓ {filepath}: {original_lines} baris (tidak perlu dibersihkan)")
-            return True
-        
-        # Ambil hanya max_lines baris terakhir
-        last_lines = lines[-max_lines:]
-        
-        # Tulis ulang file dengan baris yang tersisa
-        with open(filepath, 'w') as f:
-            f.writelines(last_lines)
-        
-        deleted_lines = original_lines - max_lines
-        print(f"✓ {filepath}: {original_lines} → {max_lines} baris ({deleted_lines} baris dihapus)")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error membersihkan {filepath}: {e}")
-        return False
-
-
 
 
 def should_run():
@@ -393,14 +356,11 @@ def main():
                     else:
                         print(f"[{current_date}] ❌ Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
                         
-                    print("\n")
-                    # bersihakan logs file
-                    log_files = ['web', 'sensor', 'send', 'retry', 'has-send', 'backup']
-                    for log_type in log_files:
-                        log_path = os.path.join('../logs', f'{log_type}.log')
-                        cleanup_log_file(log_path, max_lines=6000)
+                    # 🧹 Panggil rotasi log untuk mencegah penumpukan    
+                    print(f"\n[{current_date}] 🧹 Memeriksa dan membersihkan log...")
+                    clean_all_logs()
+                    print()
                     
-
                     last_run = now.replace(second=0, microsecond=0)
             
             time.sleep(0.5)

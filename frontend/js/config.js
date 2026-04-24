@@ -108,6 +108,12 @@ async function loadConfiguration() {
         if (document.getElementById('config-geo-longitude')) {
             document.getElementById('config-geo-longitude').value = config.geo_longitude || '0';
         }
+        if (document.getElementById('config-web-username')) {
+            document.getElementById('config-web-username').value = config.web_username || 'admin';
+        }
+        if (document.getElementById('config-web-password')) {
+            document.getElementById('config-web-password').value = config.web_password || 'has123456';
+        }
         
         // Sensors
         const sensors = [
@@ -196,6 +202,8 @@ async function saveConfiguration() {
                 gap_web: document.getElementById('config-gap-web')?.value || '3',
                 web_title: document.getElementById('config-web-title')?.value || '',
                 web_name: document.getElementById('config-web-name')?.value || '',
+                web_username: document.getElementById('config-web-username')?.value || 'admin',
+                web_password: document.getElementById('config-web-password')?.value || 'has123456',
                 location_name: document.getElementById('config-location-name')?.value || '',
                 software_version: document.getElementById('config-software-version')?.value || '',
                 geo_latitude: document.getElementById('config-geo-latitude')?.value || '0',

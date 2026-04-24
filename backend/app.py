@@ -19,9 +19,9 @@ from config import loadConfig, mysqlConfig, ambilDateAll, CONFIG_DB_PATH, cekTab
 # === Load Configuration from SQLite ===
 try:
     CONFIG_DB = loadConfig()
-    print("✅ Configuration loaded from SQLite database")
+    print("Configuration loaded from SQLite database")
 except Exception as e:
-    print(f"❌ Failed to load config from SQLite: {e}")
+    print(f"Failed to load config from SQLite: {e}")
     exit(1)
 
 # === MySQL Config from SQLite ===
@@ -78,18 +78,18 @@ try:
             "longitude": float(CONFIG_DB.get("geo_longitude", "0")),
         }
     }
-    print("✅ Web CONFIG loaded from SQLite")
+    print("Web CONFIG loaded from SQLite")
 except Exception as e:
-    print(f"❌ Failed to load web config from SQLite: {e}")
+    print(f"Failed to load web config from SQLite: {e}")
     CONFIG = {"parameters": []}
     
 
 # === Initialize Database Tables ===
 try:
     cekTable()
-    print("✅ Database tables initialized")
+    print("Database tables initialized")
 except Exception as e:
-    print(f"⚠️ Warning during table initialization: {e}")
+    print(f"Warning during table initialization: {e}")
 
 # === Flask App ===
 app = Flask(__name__, static_folder=None)
@@ -102,8 +102,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 
 # Default credentials - change these in production
-DEFAULT_USERNAME = 'admin'
-DEFAULT_PASSWORD_HASH = hashlib.sha256('has123456'.encode()).hexdigest()
+# (Credentials are now managed via SQLite config)
 
 def hash_password(password):
     """Hash password using SHA256"""
@@ -169,15 +168,15 @@ def get_usb_devices():
                                 os.makedirs(mount_point, exist_ok=True)
                                 try:
                                     subprocess.run(['mount', part_name, mount_point], check=True)
-                                    print(f"✅ Mounted {part_name} at {mount_point}")
+                                    print(f"Mounted {part_name} at {mount_point}")
                                     MOUNTED_USB.append(mount_point)
                                 except subprocess.CalledProcessError as e:
-                                    print(f"❌ Mount failed for {part_name}: {e}")
+                                    print(f"Mount failed for {part_name}: {e}")
                                     continue
                             devices.append({"label": vendor.strip(), "mount": mount_point})
         return devices
     except Exception as e:
-        print(f"❌ USB detection error: {e}")
+        print(f"USB detection error: {e}")
         return []
 
 
@@ -186,9 +185,9 @@ def cleanup_usb_mounts():
     for mount_point in MOUNTED_USB:
         try:
             subprocess.run(['umount', mount_point], check=True)
-            print(f"🛑 Unmounted {mount_point}")
+            print(f"Unmounted {mount_point}")
         except subprocess.CalledProcessError as e:
-            print(f"⚠️ Failed to unmount {mount_point}: {e}")
+            print(f"Failed to unmount {mount_point}: {e}")
     MOUNTED_USB = []
 
 
@@ -238,7 +237,7 @@ def latest_data():
         return jsonify(row)
 
     except Exception as e:
-        print(f"❌ Exception in /api/latest: {e}")
+        print(f"Exception in /api/latest: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -277,7 +276,7 @@ def history_data():
             "values": df[param].to_list()
         })
     except Exception as e:
-        print(f"❌ /api/history error: {e}")
+        print(f"/api/history error: {e}")
         return jsonify({"timestamps": [], "values": [], "error": str(e)}), 500
 
 
@@ -318,7 +317,7 @@ def windrose_data():
         })
 
     except Exception as e:
-        print("❌ /api/windrose error: %s", e)
+        print(f"/api/windrose error: {e}")
         traceback.print_exc()
         return jsonify({"timestamps": [], "wspeed": [], "wdir": [], "error": str(e)}), 500
 
@@ -331,7 +330,7 @@ def list_usb_devices():
         devices = ["download"] + [usb["label"] for usb in usb_devices]
         return jsonify(devices)
     except Exception as e:
-        print(f"❌ USB list error: {e}")
+        print(f"USB list error: {e}")
         return jsonify(["download"]), 500
     finally:
         cleanup_usb_mounts()
@@ -348,7 +347,7 @@ def export_data():
         if not start or not end:
             return jsonify({"error": "Parameter 'start' dan 'end' wajib diisi."}), 400
 
-        print(f"📦 Export request: {start} → {end} to {destination}")
+        print(f"Export request: {start} → {end} to {destination}")
         start_dt = datetime.fromisoformat(start)
         end_dt = datetime.fromisoformat(end)
         
@@ -399,10 +398,10 @@ def export_data():
                 return jsonify({"error": f"USB '{destination}' tidak ditemukan atau tidak bisa ditulis."}), 500
             export_path = os.path.join(mount_point, filename)
             df.write_csv(export_path)
-            print(f"✅ Data exported to: {export_path}")
+            print(f"Data exported to: {export_path}")
             return jsonify({"status": "success", "path": export_path})
     except Exception as e:
-        print(f"❌ Export error: {e}")
+        print(f"Export error: {e}")
         return jsonify({"error": str(e)}), 500
     finally:
         cleanup_usb_mounts()
@@ -466,7 +465,7 @@ def connect_wifi():
 
 @app.route('/api/system/restart', methods=['POST'])
 def restart():
-    logging.warning("⚠️ Restart requested!")
+    logging.warning("Restart requested!")
     os.system('sudo reboot')
     return jsonify({
         "success": True,
@@ -476,7 +475,7 @@ def restart():
 
 @app.route('/api/system/shutdown', methods=['POST'])
 def shutdown():
-    logging.warning("⚠️ Shutdown requested!")
+    logging.warning("Shutdown requested!")
     os.system('sudo shutdown now')
     return '', 204
 
@@ -520,13 +519,18 @@ def login():
             return jsonify({'success': False, 'message': 'Username and password required'}), 400
         
         # Check credentials
-        if username == DEFAULT_USERNAME and verify_password(password, DEFAULT_PASSWORD_HASH):
+        current_config = loadConfig()
+        expected_user = current_config.get('web_username', 'admin')
+        expected_pass = current_config.get('web_password', 'has123456')
+        
+        # Verify
+        if username == expected_user and password == expected_pass:
             session['username'] = username
             session.permanent = True
-            print(f"✅ User '{username}' logged in successfully")
+            print(f"User '{username}' logged in successfully")
             return jsonify({'success': True, 'message': 'Login successful'})
         else:
-            logging.warning(f"⚠️ Failed login attempt for user '{username}'")
+            logging.warning(f"Failed login attempt for user '{username}'")
             return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
     except Exception as e:
         print(f"Login error: {e}")
@@ -539,7 +543,7 @@ def logout():
     try:
         username = session.get('username', 'unknown')
         session.clear()
-        print(f"✅ User '{username}' logged out")
+        print(f"User '{username}' logged out")
         return jsonify({'success': True, 'message': 'Logout successful'})
     except Exception as e:
         print(f"Logout error: {e}")
@@ -587,7 +591,7 @@ def get_configuration():
             
             return jsonify(config_dict)
         except Exception as e:
-            print(f"❌ Error reading configuration: {e}")
+            print(f"Error reading configuration: {e}")
             import traceback
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
@@ -620,6 +624,7 @@ def get_configuration():
                 'has_status', 'has_api_url', 'has_token_api', 'has_fields',
                 'has_logs_api_url', 'has_logs_token_api',
                 'parameters', 'gap_web', 'web_title', 'web_name',
+                'web_username', 'web_password',
                 'device_id', 'location_name', 'software_version', 'geo_latitude', 'geo_longitude'
             }
             
@@ -639,7 +644,7 @@ def get_configuration():
                 set_clause = ', '.join([f'{k}=?' for k in config_data.keys()])
                 query = f"UPDATE config SET {set_clause} WHERE id=1"
                 cursor.execute(query, list(config_data.values()))
-                print(f"✅ Updated config table: {list(config_data.keys())}")
+                print(f"Updated config table: {list(config_data.keys())}")
             
             # Filter data for satuan table
             satuan_data = {k: v for k, v in data.items() if k in satuan_fields}
@@ -647,13 +652,13 @@ def get_configuration():
                 set_clause = ', '.join([f'{k}=?' for k in satuan_data.keys()])
                 query = f"UPDATE satuan SET {set_clause} WHERE id=1"
                 cursor.execute(query, list(satuan_data.values()))
-                print(f"✅ Updated satuan table: {list(satuan_data.keys())}")
+                print(f"Updated satuan table: {list(satuan_data.keys())}")
             
             conn.commit()
             cursor.close()
             conn.close()
             
-            print(f"✅ Configuration saved successfully: {len(data)} fields updated")
+            print(f"Configuration saved successfully: {len(data)} fields updated")
             
             # Reload config in memory from database
             global CONFIG_DB, CONFIG
@@ -708,7 +713,7 @@ def get_configuration():
                 "updated_keys": list(data.keys())
             })
         except Exception as e:
-            print(f"❌ Error saving configuration: {e}")
+            print(f"Error saving configuration: {e}")
             import traceback
             traceback.print_exc()
             return jsonify({"success": False, "message": str(e)}), 500

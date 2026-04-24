@@ -56,7 +56,7 @@ def initConfig():
         return True
         
     except Exception as e:
-        write_log(f"❌ Error saat inisialisasi konfigurasi: {e}")
+        write_log(f" Error saat inisialisasi konfigurasi: {e}")
         return False
 
 # Initialize configuration at startup
@@ -69,10 +69,10 @@ def refreshConfig():
     global STATUS, TIMEZONE, API_ENDPOINT, TOKEN_API, FIELDS, DEVICE_ID, MYSQL_CONFIG, tz
     
     if not initConfig():
-        write_log(f"⚠️ Gagal me-refresh konfigurasi")
+        write_log(f"Gagal me-refresh konfigurasi")
         return False
     
-    write_log(f"✅ Konfigurasi berhasil dimuat ulang dari config.db")
+    write_log(f"Konfigurasi berhasil dimuat ulang dari config.db")
     return True
 
 
@@ -93,10 +93,10 @@ def ambil_data(fields, date):
                     return None
                 
     except mysql.connector.Error as e:
-        write_log(f"❌ DB Error: {e}")
+        write_log(f" DB Error: {e}")
         return None
     except Exception as e:
-        write_log(f"❌ Error ambil_data: {e}")
+        write_log(f" Error ambil_data: {e}")
         return None
 
 
@@ -118,10 +118,10 @@ def ambil_tmp(fields, date):
                     return None
                 
     except mysql.connector.Error as e:
-        write_log(f"❌ DB Error: {e}")
+        write_log(f"DB Error: {e}")
         return None
     except Exception as e:
-        write_log(f"❌ Error ambil_tmp: {e}")
+        write_log(f"Error ambil_tmp: {e}")
         return None
 
 
@@ -192,15 +192,15 @@ def send_data_to_api(date):
     }
 
     if not payload["data"]:
-        write_log(f"ℹ️ Tidak ada data baru untuk dikirim ke HAS API pada tanggal {date_str}.")
+        write_log(f"Tidak ada data baru untuk dikirim ke HAS API pada tanggal {date_str}.")
         return False
 
     try:
         response = requests.post(API_ENDPOINT, headers=headers, json=payload,timeout=(5, 30))
-        write_log(f"Payload:\n{json.dumps(payload, indent=4, sort_keys=False)}")
+        # write_log(f"Payload:\n{json.dumps(payload, indent=4, sort_keys=False)}")
 
         if response.status_code in [200, 201]:  # 200 OK atau 201 Created
-            write_log(f"✅ Data untuk tanggal {date_str} berhasil dikirim ke HAS API.")
+            write_log(f"Data untuk tanggal {date_str} berhasil dikirim ke HAS API.")
             
             # Update status 'has' di database
             try:
@@ -220,24 +220,24 @@ def send_data_to_api(date):
                         tmp_updated = cursor.rowcount
                         
                         conn.commit()
-                        write_log(f"✅ Status 'has' diperbarui: {data_updated} rows di 'data', {tmp_updated} rows di 'tmp' untuk tanggal {date_str}")
+                        write_log(f"Status 'has' diperbarui: {data_updated} rows di 'data', {tmp_updated} rows di 'tmp' untuk tanggal {date_str}")
             except mysql.connector.Error as e:
-                write_log(f"❌ DB Error saat memperbarui status 'has': {e}")
+                write_log(f"DB Error saat memperbarui status 'has': {e}")
             except Exception as e:
-                write_log(f"❌ Error saat memperbarui status 'has': {e}")
+                write_log(f"Error saat memperbarui status 'has': {e}")
             return True
         else:
-            write_log(f"❌ Gagal mengirim data untuk tanggal {date_str}. Status Code: {response.status_code}, Response: {response.text}")
+            write_log(f"Gagal mengirim data untuk tanggal {date_str}. Status Code: {response.status_code}, Response: {response.text}")
             return False
     except requests.RequestException as e:
-        write_log(f"❌ Error saat mengirim data ke HAS API: {e}")
+        write_log(f"Error saat mengirim data ke HAS API: {e}")
         return False
 
 
 
 def scheduler():
     """Jalankan scheduler untuk mengirim data ke HAS API setiap menit tepat di detik 0, efisien CPU"""
-    write_log(f"⏱️ Service HAS aktif. Menunggu jadwal pengiriman data ke HAS API...")
+    write_log(f"Service HAS aktif. Menunggu jadwal pengiriman data ke HAS API...")
 
     try:
         while True:
@@ -254,10 +254,10 @@ def scheduler():
             if STATUS.lower() == 'active':
                 send_data_to_api(DATE)
             else:
-                write_log(f"⚠️ Service HAS tidak aktif. Lewati pengiriman data.")
+                write_log(f"Service HAS tidak aktif. Lewati pengiriman data.")
             
     except KeyboardInterrupt:
-        write_log(f"🛑 Service HAS dihentikan manual.")
+        write_log(f"Service HAS dihentikan manual.")
 
 if __name__ == "__main__":
     scheduler()
