@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Log Viewer - Pro</title>
-    
+
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
     <!-- External Libraries -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -38,7 +41,8 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent body scroll, handle inside components */
+            overflow: hidden;
+            /* Prevent body scroll, handle inside components */
             margin: 0;
         }
 
@@ -208,7 +212,8 @@
             flex-direction: column;
             background-color: var(--bg-terminal);
             position: relative;
-            min-width: 0; /* Fix flex item overflow */
+            min-width: 0;
+            /* Fix flex item overflow */
         }
 
         .terminal-header {
@@ -273,10 +278,10 @@
             display: flex;
             gap: 1rem;
             margin-bottom: 0.25rem;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             padding-bottom: 0.1rem;
         }
-        
+
         .log-time {
             color: var(--text-secondary);
             flex-shrink: 0;
@@ -294,10 +299,25 @@
             height: fit-content;
         }
 
-        .level-info { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .level-warn { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .level-error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .level-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .level-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .level-warn {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .level-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .level-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
 
         .log-msg {
             color: var(--text-primary);
@@ -334,23 +354,60 @@
             color: white;
         }
 
-        .btn-secondary-dark { background: #334155; color: #cbd5e1; }
-        .btn-secondary-dark:hover { background: #475569; }
+        .btn-secondary-dark {
+            background: #334155;
+            color: #cbd5e1;
+        }
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary-dark:hover {
+            background: #475569;
+        }
 
-        .btn-warning { background: var(--warning); color: #0f172a; }
-        .btn-warning:hover { background: #d97706; }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
 
-        .btn-success { background: var(--success); color: #0f172a; }
-        .btn-success:hover { background: #059669; }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #0f172a;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #0f172a;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
 
         /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-terminal); }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-terminal);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
 
         /* =========================================
            RESPONSIVE DESIGN (MOBILE)
@@ -361,7 +418,7 @@
                 display: flex !important;
                 position: static;
             }
-            
+
             .sidebar.offcanvas {
                 display: none !important;
             }
@@ -372,7 +429,7 @@
             .sidebar.d-lg-flex {
                 display: none !important;
             }
-            
+
             .sidebar.offcanvas {
                 display: flex;
                 position: fixed;
@@ -385,7 +442,7 @@
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
             }
-            
+
             .sidebar.offcanvas.show {
                 transform: translateX(0);
             }
@@ -416,12 +473,14 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- ============== HEADER ============== -->
     <header class="app-header">
         <div class="header-brand">
-            <button class="btn-icon d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+            <button class="btn-icon d-lg-none me-2" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarOffcanvas">
                 <i class="bi bi-list"></i>
             </button>
             <i class="bi bi-activity"></i>
@@ -440,7 +499,7 @@
 
     <!-- ============== MAIN CONTENT ============== -->
     <div class="main-layout">
-        
+
         <!-- Desktop Sidebar (Visible on LG+) -->
         <div class="sidebar d-none d-lg-flex">
             <div class="w-100 d-flex flex-column h-100">
@@ -487,7 +546,8 @@
         <div class="sidebar offcanvas offcanvas-start d-lg-none" tabindex="-1" id="sidebarOffcanvas">
             <div class="offcanvas-header border-bottom border-secondary">
                 <h5 class="offcanvas-title text-white"><i class="bi bi-folder me-2"></i>Kategori Log</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
             </div>
             <div class="offcanvas-body flex-column d-flex p-0">
                 <div class="p-3 d-flex flex-column h-100">
@@ -497,18 +557,18 @@
                         <button class="nav-btn active" onclick="switchLog('web', this)">
                             <i class="bi bi-terminal"></i> Web Log
 
-                        <button class="nav-btn active" onclick="switchLog('sensor', this)">
-                            <i class="bi bi-terminal"></i> Sensor Log
-                        </button>
-                        <button class="nav-btn" onclick="switchLog('send', this)">
-                            <i class="bi bi-send"></i> Send Log
-                        </button>
-                        <button class="nav-btn" onclick="switchLog('retry', this)">
-                            <i class="bi bi-arrow-repeat"></i> Retry Log
-                        </button>
-                        <button class="nav-btn" onclick="switchLog('has-send', this)">
-                            <i class="bi bi-cloud-check"></i> HAS Send Log
-                        </button>
+                            <button class="nav-btn active" onclick="switchLog('sensor', this)">
+                                <i class="bi bi-terminal"></i> Sensor Log
+                            </button>
+                            <button class="nav-btn" onclick="switchLog('send', this)">
+                                <i class="bi bi-send"></i> Send Log
+                            </button>
+                            <button class="nav-btn" onclick="switchLog('retry', this)">
+                                <i class="bi bi-arrow-repeat"></i> Retry Log
+                            </button>
+                            <button class="nav-btn" onclick="switchLog('has-send', this)">
+                                <i class="bi bi-cloud-check"></i> HAS Send Log
+                            </button>
                     </nav>
 
                     <div class="sidebar-footer mt-auto">
@@ -528,12 +588,12 @@
 
         <!-- Terminal Area -->
         <div class="terminal-container">
-            
+
             <!-- Terminal Header -->
             <div class="terminal-header">
                 <div class="terminal-info">
                     <h3 id="current-log-title">
-                        <i class="bi bi-terminal-fill text-primary"></i> 
+                        <i class="bi bi-terminal-fill text-primary"></i>
                         <span id="log-title-text">Main Log</span>
                     </h3>
                     <div id="logSubtitle" class="text-secondary small mt-1"></div>
@@ -554,7 +614,8 @@
 
             <!-- Auto Scroll Toggle (Floating) -->
             <div style="position: absolute; bottom: 80px; right: 20px; z-index: 10;">
-                <button class="btn btn-secondary-dark rounded-pill py-2 px-3 shadow" id="autoScrollBtn" onclick="toggleAutoScroll()">
+                <button class="btn btn-secondary-dark rounded-pill py-2 px-3 shadow" id="autoScrollBtn"
+                    onclick="toggleAutoScroll()">
                     <i class="bi bi-pin-angle-fill"></i> Auto-Scroll
                 </button>
             </div>
@@ -623,16 +684,16 @@
                     hour12: false,
                     timeZone: timezone
                 });
-                
+
                 const parts = formatter.formatToParts(date);
                 const values = {};
-                
+
                 parts.forEach(part => {
                     if (part.type !== 'literal') {
                         values[part.type] = part.value;
                     }
                 });
-                
+
                 return `${values.year}-${values.month}-${values.day} ${values.hour}:${values.minute}:${values.second}`;
             } catch (error) {
                 // Fallback jika timezone tidak valid
@@ -669,11 +730,11 @@
             scheduleNext();
         }
 
-          // Update "last updated" timestamp with running time using timezone
+        // Update "last updated" timestamp with running time using timezone
         function updateLogTimestamp() {
             const now = new Date();
             const runningTime = formatTimeWithTimezone(now, appTimezone);
-            
+
             const logSubtitle = document.getElementById('logSubtitle');
             if (logSubtitle) {
                 logSubtitle.innerHTML = `<span class="ms-3"><i class="bi bi-clock"></i> ${runningTime}</span>`;
@@ -732,7 +793,7 @@
 
                 // Fetch logs from backend
                 const response = await fetch(`/api/logs/${state.currentLog}`);
-                
+
                 if (!response.ok) {
                     if (response.status === 401) {
                         // Redirect to login if unauthorized
@@ -793,7 +854,7 @@
         // CORE FUNCTIONS
         // ==========================================
 
-       function init() {
+        function init() {
             // Load timezone from config first
             loadTimezoneFromConfig().then(() => {
                 // Load initial logs from backend
@@ -839,7 +900,7 @@
 
         function addLogEntry(logData) {
             state.logs.push(logData);
-            
+
             // Limit memory usage
             if (state.logs.length > state.maxLogs) {
                 state.logs.shift();
@@ -867,10 +928,10 @@
         function switchLog(logType, btnElement) {
             state.currentLog = logType;
             DOM.title.innerText = btnElement ? btnElement.innerText.trim() : logType.toUpperCase() + " LOG";
-            
+
             // Update Active Class on ALL sidebar buttons
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
+
             // Find and activate the matching button in both sidebars
             document.querySelectorAll(`.nav-btn[onclick*="'${logType}'"]`).forEach(b => {
                 b.classList.add('active');
@@ -889,12 +950,12 @@
             DOM.viewer.innerHTML = '<div class="text-secondary text-center mt-5"><i class="bi bi-arrow-clockwise spin me-2"></i> Loading logs...</div>';
             state.logs = [];
             updateLineCount();
-            
+
             // Load logs from backend
             loadLogsFromBackend().then(() => {
                 // Update last log update time
                 lastLogUpdate = new Date();
-                
+
                 // Show success toast
                 const Toast = Swal.mixin({
                     toast: true,
@@ -945,7 +1006,7 @@
 
         function toggleAutoScroll() {
             state.autoScroll = !state.autoScroll;
-            if(state.autoScroll) {
+            if (state.autoScroll) {
                 DOM.autoScrollBtn.classList.add('btn-primary');
                 DOM.autoScrollBtn.classList.remove('btn-secondary-dark');
                 DOM.autoScrollBtn.innerHTML = '<i class="bi bi-pin-angle-fill"></i> Auto-Scroll';
@@ -1001,7 +1062,7 @@
 
         function copyLogContent() {
             const text = state.logs.map(l => `[${l.time}] [${l.level.toUpperCase()}] ${l.msg}`).join('\n');
-            
+
             navigator.clipboard.writeText(text).then(() => {
                 Swal.fire({
                     title: 'Tersalin!',
@@ -1023,7 +1084,7 @@
             const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            
+
             link.href = url;
             link.download = `log-${state.currentLog}-${timestamp}.txt`;
             document.body.appendChild(link);
@@ -1071,4 +1132,5 @@
 
     </script>
 </body>
+
 </html>
