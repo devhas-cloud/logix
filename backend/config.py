@@ -132,6 +132,7 @@ def defaultConfig():
 
 
             -- klhk api
+            klhk_timezone TEXT,
             klhk_status TEXT,
             klhk_api_url TEXT,
             klhk_token_url TEXT,
@@ -276,8 +277,9 @@ def defaultConfig():
             'delay': '2',
 
             # klhk api
+            'klhk_timezone': 'Asia/Jakarta',
             'klhk_status': 'inactive',
-            'klhk_api_url': 'https://sparing.kemenlh.go.id/api/send-hourly-vendor',
+            'klhk_api_url': 'https://sparing.kemenlh.go.id/api/send-hourly',
             'klhk_token_url': 'https://sparing.kemenlh.go.id/api/secret-sensor',
             'klhk_uid': '',
             'klhk_fields': 'datetime,pH,cod,tss,nh3n,flow',
@@ -288,7 +290,7 @@ def defaultConfig():
             "has_status": "inactive",
             "has_api_url": "https://api.hasportal.com/api/v1/data",
             "has_token_api": "",
-            "has_fields": "datetime,pH,cod,tss,nh3n,flow,wtemp,orp,turb,tds,conduct,do,depth,bod,wpress",
+            "has_fields": "unix_time,pH,cod,tss,nh3n,flow,wtemp,orp,turb,tds,conduct,do,depth,bod,wpress",
 
             # has logs
             "has_logs_token_api": "",
@@ -475,12 +477,35 @@ def ambilDate():
     date = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
     return date
 
-def ambilDateTime():
-    tz = loadConfig()['timezone']
-    tz = pytz.timezone(tz)
-    Interval_Timestamp = datetime.strptime(ambilDateAll(), '%Y-%m-%d %H:%M:%S')
-    unix_dt = int(time.mktime(Interval_Timestamp.timetuple()))
+
+# Ambil unix sesuai dengan ketentuan klhk
+
+def ambilDateTime(dt_str=None):
+    config = loadConfig()
+    tz_name = config.get('klhk_timezone', config.get('timezone', 'Asia/Jakarta'))
+    tz = pytz.timezone(tz_name)
+    if dt_str is None:
+        dt_str = ambilDateAll()
+    naive_dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+    # jadikan datetime aware sesuai timezone
+    aware_dt = tz.localize(naive_dt)
+    # konversi ke unix timestamp
+    unix_dt = int(aware_dt.timestamp())
     return unix_dt
+
+
+# Ambil unix time global
+def ambilUnixTime(dt_str=None):
+    tz_name = loadConfig()['timezone']
+    tz = pytz.timezone(tz_name)
+    if dt_str is None:
+        dt_str = ambilDateAll()
+    naive_dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+    # jadikan aware datetime sesuai timezone
+    aware_dt = tz.localize(naive_dt)
+    # konversi ke unix timestamp
+    unix_time = int(aware_dt.timestamp())
+    return unix_time
       
 def cekTable():
     try:
@@ -583,19 +608,48 @@ def cekTable():
 
         # Penambahan filed created_at untuk mencatat waktu pembuatan data, jika sudah ada tidak akan menambah kolom baru
         # Check if column exists before adding it (compatible with MySQL < 8.0)
-        cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='data' AND COLUMN_NAME='created_at'")
-        if cursor.fetchone()[0] == 0:
-            cursor.execute("ALTER TABLE data ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP")
-        
-        cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='tmp' AND COLUMN_NAME='created_at'")
-        if cursor.fetchone()[0] == 0:
-            cursor.execute("ALTER TABLE tmp ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP")
-        conn.commit()
-        
+        try:
+            cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='data' AND COLUMN_NAME='created_at' AND TABLE_SCHEMA=DATABASE()")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("ALTER TABLE data ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP")
+                conn.commit()
+        except Exception as e:
+            print(f"[ERROR] Failed to add 'created_at' column to 'data' table: {e}")
+
+        try:
+            cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='tmp' AND COLUMN_NAME='created_at' AND TABLE_SCHEMA=DATABASE()")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("ALTER TABLE tmp ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP")
+                conn.commit()
+        except Exception as e:
+            print(f"[ERROR] Failed to add 'created_at' column to 'tmp' table: {e}")
+
         # Penambahan filed category untuk membedakan jenis pengiriman data ke KLHK, jika sudah ada tidak akan menambah kolom baru
-        cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='klhk_json_encode_success' AND COLUMN_NAME='category'")
-        if cursor.fetchone()[0] == 0:
-            cursor.execute("ALTER TABLE klhk_json_encode_success ADD COLUMN category TEXT DEFAULT NULL")
+        try:
+            cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='klhk_json_encode_success' AND COLUMN_NAME='category' AND TABLE_SCHEMA=DATABASE()")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("ALTER TABLE klhk_json_encode_success ADD COLUMN category TEXT DEFAULT NULL")
+                conn.commit()
+                
+        except Exception as e:
+            print(f"[ERROR] Failed to add 'category' column to 'klhk_json_encode_success' table: {e}")
+    
+        # Menambahkan unix time global, karena datetime sudah ada untuk klhk tidak global.
+        try:
+            cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='data' AND COLUMN_NAME='unix_time' AND TABLE_SCHEMA=DATABASE()")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("ALTER TABLE data ADD COLUMN unix_time BIGINT DEFAULT 0")
+                conn.commit()
+        except Exception as e:
+            print(f"[ERROR] Failed to add 'unix_time' column to 'data' table: {e}")
+
+        try:
+            cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='tmp' AND COLUMN_NAME='unix_time' AND TABLE_SCHEMA=DATABASE()")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("ALTER TABLE tmp ADD COLUMN unix_time BIGINT DEFAULT 0")
+                conn.commit()
+        except Exception as e:
+            print(f"[ERROR] Failed to add 'unix_time' column to 'tmp' table: {e}")
 
 
         
@@ -603,13 +657,13 @@ def cekTable():
         print(f"[{datetime.now()}] Error pada koneksi database: {e}")
         return    
 
-def insert_data(date,  datetime, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad):
+def insert_data(date,  datetime, unix_time, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad):
     
     device = loadConfig()['device_id']
     cekTable()        
     query = """
-        INSERT INTO tmp (device, date, datetime, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,  %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        INSERT INTO tmp (device, date, datetime, unix_time, ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,  %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         
     try:
@@ -618,7 +672,7 @@ def insert_data(date,  datetime, ph, orp, tds, conduct, do, salinity, nh3n, batt
 
         values = (
                 device,
-                date, datetime,
+                date, datetime, unix_time,
                 ph, orp, tds, conduct, do, salinity, nh3n, battery, depth, flow, tflow, turb, tss, cod, bod, no3, atemp,wtemp, apress, wpress, hum, wspeed, wdir, rain, srad
             )
             #values = tuple("NULL" if v is None else v for v in values) # ganti jika None menjadi 0

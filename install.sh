@@ -12,7 +12,7 @@
 
 # Strict mode
 set -euo pipefail
-trap 'echo "❌ Error pada baris $LINENO. Perintah gagal: $BASH_COMMAND"' ERR
+trap 'echo "Error pada baris $LINENO. Perintah gagal: $BASH_COMMAND"' ERR
 
 # === Fungsi ===
 check_port() {
@@ -22,14 +22,14 @@ check_port() {
     elif command -v netstat >/dev/null 2>&1; then
         netstat -tuln | grep -q ":$port " && return 0
     else
-        echo "⚠️  Tidak dapat mengecek port: ss/netstat tidak ditemukan" >&2
+        echo "Tidak dapat mengecek port: ss/netstat tidak ditemukan" >&2
         return 2
     fi
     return 1
 }
 
 error_exit() {
-    echo "❌ $1" >&2
+    echo "$1" >&2
     exit 1
 }
 
@@ -74,9 +74,9 @@ if [ ${#missing_deps[@]} -ne 0 ]; then
     echo "Menginstall dependensi..."
     sudo apt update
     sudo apt install -y "${missing_deps[@]}"
-    echo "✅ Instalasi selesai."
+    echo "Instalasi selesai."
 else
-    echo "✅ Semua dependensi sudah terpenuhi."
+    echo "Semua dependensi sudah terpenuhi."
 fi
 echo ""
 
@@ -89,7 +89,7 @@ for service in "${CHECK_SERVICES[@]}"; do
 done
 
 if [ "$found_existing" = true ]; then
-    echo "🚫 Instalasi dibatalkan. Service sudah ada."
+    echo "Instalasi dibatalkan. Service sudah ada."
     exit 1
 fi
 echo "Tidak ada konflik service. Lanjut instalasi..."
@@ -171,12 +171,12 @@ EOF
     systemctl enable "$service"
     systemctl restart "$service"
 done
-echo "✅ Semua service systemd aktif."
+echo "Semua service systemd aktif."
 echo ""
 
 
 # === Selesai ===
-echo "🎉 Instalasi logix selesai!"
+echo "Instalasi logix selesai!"
 echo "Gunakan perintah 'logix' di terminal."
 echo "============================================"
 echo "Aplikasi dapat diakses di:"

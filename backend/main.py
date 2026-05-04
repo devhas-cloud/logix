@@ -7,7 +7,7 @@ from rt200 import get_rt200_data
 from sem5096 import get_sem5096_data
 from iscan import get_iscan_data 
 from ltnc import get_ltnc_data 
-from config import insert_data, ambilDate, ambilDateTime, loadConfig
+from config import insert_data, ambilDate, ambilDateTime, ambilUnixTime, loadConfig
 from datetime import datetime
 from contlyte import get_conlyte_data
 from ds502 import get_ds502_data
@@ -25,9 +25,9 @@ import pytz
 # === Load Configuration from SQLite ===
 try:
     CONFIG_DB = loadConfig()
-    print("✅ Configuration loaded from SQLite database")
+    print("Configuration loaded from SQLite database")
 except Exception as e:
-    print(f"❌ Failed to load config from SQLite: {e}")
+    print(f"Failed to load config from SQLite: {e}")
     exit(1)
 
 # === Configuration from SQLite ===
@@ -60,7 +60,7 @@ def main():
     global CONFIG_DB, DELAY, AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, RT200_STATUS, SEM5096_STATUS, ARG314_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, DS502_STATUS, AMMONIA200_STATUS, COD200X_STATUS, H1601_STATUS, PH200_STATUS, TSS200X_STATUS, XYMD02_STATUS
     
     current_date = ambilDate()
-    print(f"[{current_date}] ⏱️ Service dimulai. Menunggu waktu eksekusi sensor setiap {DELAY} menit.")
+    print(f"[{current_date}] Service dimulai. Menunggu waktu eksekusi sensor setiap {DELAY} menit.")
     last_run = None
     
     # Initialize variables with default values (None)
@@ -84,7 +84,7 @@ def main():
                     # load ulang configuration setiap kali akan membaca sensor, untuk memastikan perubahan konfigurasi langsung diterapkan tanpa perlu restart service
                     try:
                         CONFIG_DB = loadConfig()
-                        print("✅ Configuration reloaded from SQLite database")
+                        print("Configuration reloaded from SQLite database")
                         
                         # Reload semua sensor status variables dari config terbaru
                         DELAY = int(CONFIG_DB.get('delay', '2'))
@@ -105,11 +105,12 @@ def main():
                         TSS200X_STATUS = CONFIG_DB.get('tss200x_status', 'inactive')
                         XYMD02_STATUS = CONFIG_DB.get('xymd02_status', 'inactive')
                     except Exception as e:
-                        print(f"❌ Failed to reload config from SQLite: {e}")
+                        print(f"Failed to reload config from SQLite: {e}")
 
                     current_date = ambilDate()
-                    current_datetime = ambilDateTime()
-                    print(f"\n[{current_date}] 📡 Membaca semua sensor...")
+                    current_datetime = ambilDateTime(current_date)
+                    current_unix_time = ambilUnixTime(current_date)
+                    print(f"\n[{current_date}] Membaca semua sensor...")
                     
                     status_filter = True
                     
@@ -128,7 +129,7 @@ def main():
                             nh3n = new_nh3n if new_nh3n is not None else nh3n
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data AT500.")
+                            print(f"[{current_date}] Gagal membaca data AT500.")
                     
                     # === RT200 ===
                     if RT200_STATUS.lower() == "active":
@@ -141,7 +142,7 @@ def main():
                             depth = new_depth if new_depth is not None else depth
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data RT200.")
+                            print(f"[{current_date}] Gagal membaca data RT200.")
                     
                     # === SEM5096 ===
                     if SEM5096_STATUS.lower() == "active":
@@ -158,7 +159,7 @@ def main():
                             srad = new_srad if new_srad is not None else srad
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data SEM5096.")
+                            print(f"[{current_date}] Gagal membaca data SEM5096.")
                     
                     
                     # === MACE ===
@@ -173,7 +174,7 @@ def main():
                             tflow = new_tflow if new_tflow is not None else tflow
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data MACE.")
+                            print(f"[{current_date}] Gagal membaca data MACE.")
                     
                     # === SPECTRO ===
                     if SPECTRO_STATUS.lower() == "active":
@@ -189,7 +190,7 @@ def main():
                             wtemp = new_temp if new_temp is not None else wtemp
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data Modbus TCP.")
+                            print(f"[{current_date}] Gagal membaca data Modbus TCP.")
                             
                     # === ISCAN ===
                     if ISCAN_STATUS.lower() == "active":
@@ -202,7 +203,7 @@ def main():
                             wtemp = new_temp if new_temp is not None else wtemp
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data ISCAN.")
+                            print(f"[{current_date}] Gagal membaca data ISCAN.")
                             
                             
                             
@@ -215,7 +216,7 @@ def main():
                             flow = new_flow if new_flow is not None else flow
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data LTNC.")
+                            print(f"[{current_date}] Gagal membaca data LTNC.")
 
                     # === CONTLYTE ===
                     if CONTLYTE_STATUS.lower() == "active":
@@ -230,7 +231,7 @@ def main():
                             wtemp = new_temp if new_temp is not None else wtemp
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data CONTLYTE.")
+                            print(f"[{current_date}] Gagal membaca data CONTLYTE.")
 
                     
                     # === DS502 ===
@@ -255,7 +256,7 @@ def main():
                             depth = new_depth if new_depth is not None else depth
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data DS502.")
+                            print(f"[{current_date}] Gagal membaca data DS502.")
 
 
                     # === AMMONIA200 ===
@@ -265,7 +266,7 @@ def main():
                             nh3n = ammonia200_data if ammonia200_data is not None else nh3n
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data Ammonia200.")
+                            print(f"[{current_date}] Gagal membaca data Ammonia200.")
                     
                     # === COD200X ===
                     if COD200X_STATUS.lower() == "active":
@@ -274,7 +275,7 @@ def main():
                             cod = cod200x_data if cod200x_data is not None else cod
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data COD200X.")
+                            print(f"[{current_date}] Gagal membaca data COD200X.")
 
                     # === H1601 ===
                     if H1601_STATUS.lower() == "active":
@@ -285,7 +286,7 @@ def main():
                             flow = new_flow if new_flow is not None else flow
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data H1601.")
+                            print(f"[{current_date}] Gagal membaca data H1601.")
 
                     # === PH200 ===
                     if PH200_STATUS.lower() == "active":
@@ -296,7 +297,7 @@ def main():
                             wtemp = new_wtemp if new_wtemp is not None else wtemp
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data PH200.")
+                            print(f"[{current_date}] Gagal membaca data PH200.")
 
                     # === TSS200X ===
                     if TSS200X_STATUS.lower() == "active":
@@ -306,7 +307,7 @@ def main():
                             tss = new_tss if new_tss is not None else tss
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data TSS200X.")
+                            print(f"[{current_date}] Gagal membaca data TSS200X.")
 
 
                     # === XYMD02 ===
@@ -318,7 +319,7 @@ def main():
                             hum = new_hum if new_hum is not None else hum
                         else:
                             status_filter = False
-                            print(f"[{current_date}] ⚠️ Gagal membaca data XYMD02.")
+                            print(f"[{current_date}] Gagal membaca data XYMD02.")
 
 
                     # === GPIO Sensors ARG314 ===
@@ -334,10 +335,10 @@ def main():
                         # Check if any sensor is active
                         if all(status.lower() != "active" for status in [AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, SEM5096_STATUS, RT200_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, ARG314_STATUS, DS502_STATUS, AMMONIA200_STATUS, COD200X_STATUS, H1601_STATUS, PH200_STATUS, TSS200X_STATUS, XYMD02_STATUS]):
                             send_sensor_log("Semua modul sensor tidak aktif. Melewati penyimpanan data.")
-                            print(f"[{current_date}] ⚠️ Semua modul sensor tidak aktif. Melewati penyimpanan data.")
+                            print(f"[{current_date}] Semua modul sensor tidak aktif. Melewati penyimpanan data.")
 
                         else:
-                            print(f"[{current_date}] ✅ Semua data sensor berhasil terbaca.")
+                            print(f"[{current_date}] Semua data sensor berhasil terbaca.")
                             print("\n=== SENSOR DATA ===")
                             print(f"→ pH: {ph}, ORP: {orp}, TDS: {tds}, Conductivity: {conduct}, DO: {do}, Salinity: {salinity}, NH3-N: {nh3n}")
                             print(f"→ Battery: {battery}, Depth: {depth}, Flow: {flow}, TFlow: {tflow}")
@@ -348,16 +349,17 @@ def main():
                             insert_data(
                                 current_date,
                                 current_datetime,
+                                current_unix_time,
                                 ph, orp, tds, conduct, do, salinity, nh3n,
                                 battery, depth, flow, tflow,
                                 turb, tss, cod, bod, no3, atemp, wtemp,
                                 apress,wpress, hum, wspeed, wdir, rain, srad
                             ) 
                     else:
-                        print(f"[{current_date}] ❌ Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
+                        print(f"[{current_date}] Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
                         
-                    # 🧹 Panggil rotasi log untuk mencegah penumpukan    
-                    print(f"\n[{current_date}] 🧹 Memeriksa dan membersihkan log...")
+                    # Panggil rotasi log untuk mencegah penumpukan    
+                    print(f"\n[{current_date}] Memeriksa dan membersihkan log...")
                     clean_all_logs()
                     print()
                     
@@ -366,7 +368,7 @@ def main():
             time.sleep(0.5)
     
     except KeyboardInterrupt:
-        print(f"\n[{current_date}] 🛑 Service dihentikan secara manual.")
+        print(f"\n[{current_date}] Service dihentikan secara manual.")
 
 if __name__ == "__main__":
     main()

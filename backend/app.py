@@ -560,6 +560,23 @@ def auth_status():
 
 
 
+# ==================== TIMEZONE ENDPOINT ====================
+
+@app.route('/api/timezone', methods=['GET'])
+def get_timezone():
+    """Mendapatkan timezone dari config database"""
+    try:
+        config = loadConfig()
+        timezone = config.get('timezone', 'Asia/Jakarta')
+        return jsonify({'timezone': timezone}), 200
+    except Exception as e:
+        return jsonify({'timezone': 'Asia/Jakarta', 'error': str(e)}), 200
+
+# ==================== CONFIG ENDPOINTS ====================
+
+
+
+
 
 # ==================== MONITORING ENDPOINTS ====================
 @app.route('/api/configuration', methods=['GET', 'POST'])
@@ -620,6 +637,7 @@ def get_configuration():
                 'h1601_status', 'h1601_port', 'ph200_status', 'ph200_port',
                 'tss200x_status', 'tss200x_port', 'xymd02_status', 'xymd02_port', 'xymd02_slave_id',
                 'delay',
+                'klhk_timezone',
                 'klhk_status', 'klhk_api_url', 'klhk_token_url', 'klhk_uid', 'klhk_fields', 'klhk_max_dup_retry', 'klhk_target_minute',
                 'has_status', 'has_api_url', 'has_token_api', 'has_fields',
                 'has_logs_api_url', 'has_logs_token_api',

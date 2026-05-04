@@ -17,8 +17,8 @@ API_TOKEN = CONFIG_DB.get("has_logs_token_api", "")
 DEVICE_ID = CONFIG_DB.get("device_id")
 TIMEZONE = CONFIG_DB.get("timezone", "Asia/Jakarta")
 
-if not API_ENDPOINT or not DEVICE_ID:
-    raise EnvironmentError("Konfigurasi env belum lengkap")
+# if not API_ENDPOINT or not DEVICE_ID:
+#     raise EnvironmentError("Konfigurasi env belum lengkap")
 
 TZ = pytz.timezone(TIMEZONE)
 
