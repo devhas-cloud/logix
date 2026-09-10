@@ -60,7 +60,7 @@ try:
         "satuanwpress": CONFIG_DB.get("satuan_wpress", "mbar"),
         "satuanbattery": CONFIG_DB.get("satuan_battery", "V"),
         "satuandepth": CONFIG_DB.get("satuan_depth", "m"),
-        "satuanflow": CONFIG_DB.get("satuan_flow", "L/s"),
+        "satuanflow": CONFIG_DB.get("satuan_flow", "m3/m"),
         "satuantflow": CONFIG_DB.get("satuan_tflow", "L/s"),
         "satuanhum": CONFIG_DB.get("satuan_hum", "%"),
         "satuanwspeed": CONFIG_DB.get("satuan_wspeed", "m/s"),

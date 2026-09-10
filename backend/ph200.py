@@ -47,8 +47,6 @@ def read_modbus(port, request, retries=MAX_RETRIES):
 def read_ph():
     return read_modbus(PH200_PORT, bytearray([0x01, 0x03, 0x00, 0x82, 0x00, 0x02]))
 
-def read_wtemp():
-    return read_modbus(PH200_PORT, bytearray([0x01, 0x03, 0x00, 0x80, 0x00, 0x02]))
 
 
 def get_ph200_data():
@@ -62,22 +60,21 @@ def get_ph200_data():
     if PH200_STATUS.lower() != "active":
         print("[INFO] Modul PH200 tidak aktif. Melewati pembacaan data.")
         send_sensor_log("Konfigurasi Modul PH200 tidak aktif.")
-        return None, None
+        return None
     
     if not os.path.exists(PH200_PORT):
         print(f"Port {PH200_PORT} tidak tersedia. Membatalkan pembacaan data.")
         send_connection_log(f"Port {PH200_PORT} tidak tersedia.")
-        return None, None
+        return None
     
     try:
         print("[INFO] Modul PH200 aktif. Melakukan pembacaan data.")
         ph = read_ph()
-        wtemp = read_wtemp()
-        return ph, wtemp
+        return ph
     except Exception as e:
         print(f"Error saat membaca data PH200: {e}")
         send_sensor_log(f"Error saat membaca data Sensor PH200: {e}")
-        return None, None
+        return None
 
 
 

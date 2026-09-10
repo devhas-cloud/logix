@@ -10,7 +10,7 @@ CONFIG_DB = loadConfig()
 H1601_PORT = CONFIG_DB.get('h1601_port')
 H1601_STATUS = CONFIG_DB.get('h1601_status')
 
-MAX_RETRIES = 5
+MAX_RETRIES = 15
 SERIAL_CFG = dict(baudrate=9600, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=0.2)
 
 def crc16(data):
@@ -30,7 +30,7 @@ def read_modbus(port, request, retries=MAX_RETRIES):
     for attempt in range(1, retries + 1):
         try:
             #print(f"\n[{port}] Percobaan {attempt}/{retries}")
-            #print(f"TX HEX: {to_hex(packet)}")
+            print(f"TX HEX: {to_hex(packet)}")
 
             with serial.Serial(port, **SERIAL_CFG) as ser:
                 time.sleep(0.2)
@@ -58,13 +58,13 @@ def read_modbus(port, request, retries=MAX_RETRIES):
     return None
 
 def read_depth():
-    return read_modbus(H1601_PORT, bytearray([0x01, 0x03, 0x00, 0x12, 0x00, 0x02]))
+    return read_modbus("/dev/ttyAMA3", bytearray([0x01, 0x03, 0x00, 0x12, 0x00, 0x02]))
 
 def read_velocity():
-    return read_modbus(H1601_PORT, bytearray([0x01, 0x03, 0x00, 0x16, 0x00, 0x02]))
+    return read_modbus("/dev/ttyAMA3", bytearray([0x01, 0x03, 0x00, 0x14, 0x00, 0x02]))
 
 def read_flow():
-    return read_modbus(H1601_PORT, bytearray([0x01, 0x03, 0x00, 0x18, 0x00, 0x02]))
+    return read_modbus("/dev/ttyAMA3", bytearray([0x01, 0x03, 0x00, 0x16, 0x00, 0x02]))
 
 
 
@@ -88,8 +88,13 @@ def get_h1601_data():
     
     try:
         print("[INFO] Modul H1601 aktif. Melakukan pembacaan data.")
+
         depth = read_depth()
+        velocity = read_velocity()
         flow = read_flow()/60
+        
+        # depth = read_depth()
+        # flow = read_flow()/60
         return depth, flow
 
     except Exception as e:

@@ -30,6 +30,9 @@ def calculate_crc16(data):
     # Modbus RTU menggunakan format Little-Endian (LSB dikirim lebih dulu)
     return struct.pack('<H', crc)
 
+def to_hex(data):
+    return " ".join(f"{b:02X}" for b in data)
+
 def read_modbus(port, request):
     # Hitung CRC secara otomatis dan gabungkan dengan request
     crc_bytes = calculate_crc16(request)
@@ -46,9 +49,15 @@ def read_modbus(port, request):
             ser = serial.Serial(port, baudrate, bytesize, parity, stopbits, timeout)
             time.sleep(0.2)
 
+            print(f"TX ({len(modbus_request)} Bytes)")
+            print(to_hex(modbus_request))
+
             ser.write(modbus_request)
             time.sleep(0.2)  # Tunggu respons
             response = ser.read(256)
+
+            print(f"RX ({len(response)} Bytes)")
+            print(to_hex(response))
 
             if not response:
                 print(f"Percobaan {attempt}/{MAX_RETRIES}: No response from {port}, retrying...")
