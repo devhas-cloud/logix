@@ -44,6 +44,13 @@ def read_modbus(port, request, retries=MAX_RETRIES):
     send_sensor_log(f"Gagal membaca data Sensor TSS200X dari {port} setelah {retries} percobaan.")
     return None
 
+
+def read_tss():
+    return read_modbus("/dev/ttyAMA5", bytearray([0x03, 0x03, 0x00, 0x82, 0x00, 0x02]))
+  
+def read_temp():
+    return read_modbus("/dev/ttyAMA5", bytearray([0x03, 0x03, 0x00, 0x80, 0x00, 0x02]))
+
 def get_tss200x_data():    
     global CONFIG_DB, TSS200X_STATUS, TSS200X_PORT
     
@@ -51,23 +58,25 @@ def get_tss200x_data():
     CONFIG_DB = loadConfig()
     TSS200X_STATUS = CONFIG_DB.get('tss200x_status')
     TSS200X_PORT = CONFIG_DB.get('tss200x_port')
-    
+    tss = read_tss()
+    wtemp = read_temp()
+
     if TSS200X_STATUS.lower() != "active":
         print("[INFO] Modul TSS200X tidak aktif. Melewati pembacaan data.")
-        return None
+        return None, None
 
     if not os.path.exists(TSS200X_PORT):
         print(f"Port {TSS200X_PORT} tidak tersedia. Membatalkan pembacaan data.")
         send_connection_log(f"Port {TSS200X_PORT} tidak tersedia.")
-        return None
+        return None, None
     
     try:
         print(f"[INFO] Modul TSS200X aktif. Melakukan pembacaan data.")
-        return read_modbus(TSS200X_PORT, bytearray([0x03, 0x03, 0x00, 0x82, 0x00, 0x02]))
+        return tss, wtemp
     except Exception as e:
         print(f"Error saat membaca data TSS200X: {e}")
         send_sensor_log(f"Error saat membaca data Sensor TSS200X: {e}")
-        return None
+        return None, None
         
 
 # if __name__ == "__main__":

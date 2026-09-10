@@ -58,7 +58,7 @@ def should_run():
 
 def main():
     global CONFIG_DB, DELAY, AT500_STATUS, MACE_STATUS, SPECTRO_STATUS, RT200_STATUS, SEM5096_STATUS, ARG314_STATUS, ISCAN_STATUS, LTNC_STATUS, CONTLYTE_STATUS, DS502_STATUS, AMMONIA200_STATUS, COD200X_STATUS, H1601_STATUS, PH200_STATUS, TSS200X_STATUS, XYMD02_STATUS
-    
+    global flow_latest
     current_date = ambilDate()
     print(f"[{current_date}] Service dimulai. Menunggu waktu eksekusi sensor setiap {DELAY} menit.")
     last_run = None
@@ -68,7 +68,9 @@ def main():
     # battery, depth, flow, tflow = (None,) * 4
     # turb, tss, cod, bod, no3, wtemp = (None,) * 6
     # wpress, hum, wspeed, wdir, rain, srad = (None,) * 6
-    
+
+
+    flow_latest = 0  # Initialize flow_latest variable    
     try:
         while True:
 
@@ -292,9 +294,8 @@ def main():
                     if PH200_STATUS.lower() == "active":
                         ph200_data = get_ph200_data()
                         if ph200_data:
-                            new_ph, new_wtemp = ph200_data
+                            new_ph = ph200_data
                             ph = new_ph if new_ph is not None else ph
-                            wtemp = new_wtemp if new_wtemp is not None else wtemp
                         else:
                             status_filter = False
                             print(f"[{current_date}] Gagal membaca data PH200.")
@@ -303,8 +304,9 @@ def main():
                     if TSS200X_STATUS.lower() == "active":
                         tss200x_data = get_tss200x_data()
                         if tss200x_data:
-                            new_tss = tss200x_data
+                            new_tss, new_wtemp = tss200x_data
                             tss = new_tss if new_tss is not None else tss
+                            wtemp = new_wtemp if new_wtemp is not None else wtemp
                         else:
                             status_filter = False
                             print(f"[{current_date}] Gagal membaca data TSS200X.")
@@ -345,7 +347,19 @@ def main():
                             print(f"→ Turbidity: {turb}, TSS: {tss}, COD: {cod}, BOD: {bod}, NO3: {no3}, atemp: {atemp}, wtemp: {wtemp}")
                             print(f"→ apress: {apress} wpress: {wpress} Hum: {hum}, WSpeed: {wspeed}, WDir: {wdir}, Rain: {rain}, SRad: {srad}")
                             print("===================  \n")
+
+                            # jika flow adalah None, gunakan flow_latest sebagai cadangan
+                            if flow is None or flow < 0:
+                                flow = flow_latest
+                                print(f"Flow auto kalibrasi: {flow_latest}")
                             
+                            # jika tss adalah none dan lebih kecil dari 0, maka set tss menjadi 0
+                            # if tss is None or tss < 0:
+                            #     tss = 0
+                            # else:
+                            #     tss = tss - 43.0
+                            # print(f"TSS auto kalibrasi: {tss}")
+
                             insert_data(
                                 current_date,
                                 current_datetime,
@@ -354,7 +368,9 @@ def main():
                                 battery, depth, flow, tflow,
                                 turb, tss, cod, bod, no3, atemp, wtemp,
                                 apress,wpress, hum, wspeed, wdir, rain, srad
-                            ) 
+                            )
+                            
+                            flow_latest = flow  # Update flow_latest with the latest flow value
                     else:
                         print(f"[{current_date}] Tidak semua sensor berhasil terbaca. Data tidak disimpan.")
                         
